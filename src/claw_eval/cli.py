@@ -104,6 +104,22 @@ def _grade_with_optional_params(
     return scores
 
 
+def _make_user_agent(cfg, task):
+    """Create a UserAgent instance if the task has user_agent enabled, or None."""
+    if not task.user_agent.enabled:
+        return None
+    from .runner.user_agent import UserAgent
+    ua_model_cfg = cfg.user_agent_model
+    api_key = ua_model_cfg.api_key or cfg.judge.api_key
+    if not api_key:
+        return None
+    return UserAgent(
+        model_id=ua_model_cfg.model_id,
+        api_key=api_key,
+        base_url=ua_model_cfg.base_url,
+    )
+
+
 def _collect_env_snapshot(sandbox_url: str, task) -> dict:
     """Collect environment data from the container after the agent loop finishes.
 
@@ -341,6 +357,7 @@ def cmd_run(args: argparse.Namespace) -> None:
                         prompt_cfg=cfg.prompt,
                         model_cfg=cfg.model,
                         media_cfg=cfg.media,
+                        user_agent=_make_user_agent(cfg, task),
                     )
                     # Inject grader-only files (e.g. verify scripts with answers)
                     # AFTER the agent loop so the agent cannot read them.
@@ -445,6 +462,7 @@ def cmd_run(args: argparse.Namespace) -> None:
                 prompt_cfg=cfg.prompt,
                 model_cfg=cfg.model,
                 media_cfg=cfg.media,
+                user_agent=_make_user_agent(cfg, task),
             )
             trace_paths_local.append(trace_path)
             print(f"Trace: {trace_path}")
@@ -551,6 +569,7 @@ def cmd_run_inner(args: argparse.Namespace) -> None:
             prompt_cfg=cfg.prompt,
             model_cfg=cfg.model,
             media_cfg=cfg.media,
+            user_agent=_make_user_agent(cfg, task),
         )
 
     print(f"Trace: {trace_path}")
@@ -791,6 +810,7 @@ def _run_single_task(
                                     prompt_cfg=cfg.prompt,
                                     model_cfg=cfg.model,
                                     media_cfg=cfg.media,
+                                    user_agent=_make_user_agent(cfg, task),
                                 )
                                 n_grader = sandbox_runner.inject_grader_files(handle, task, task_dir=task_dir)
                                 if task.sandbox_grader_files and n_grader < len(task.sandbox_grader_files):
@@ -806,6 +826,7 @@ def _run_single_task(
                                 prompt_cfg=cfg.prompt,
                                 model_cfg=cfg.model,
                                 media_cfg=cfg.media,
+                                user_agent=_make_user_agent(cfg, task),
                             )
 
                         # Read local grader files from host (GT files, never touched by agent)

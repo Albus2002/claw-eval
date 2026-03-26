@@ -5,7 +5,11 @@ from __future__ import annotations
 import json
 import time
 from pathlib import Path
+from typing import TYPE_CHECKING
 from uuid import uuid4
+
+if TYPE_CHECKING:
+    from .user_agent import UserAgent
 
 from ..config import MediaConfig, ModelConfig, PromptConfig
 from ..models.content import ContentBlock, TextBlock, ToolResultBlock
@@ -165,6 +169,7 @@ def run_task(
     prompt_cfg: PromptConfig | None = None,
     model_cfg: ModelConfig | None = None,
     media_cfg: MediaConfig | None = None,
+    user_agent: "UserAgent | None" = None,
 ) -> Path:
     """Execute one trial of a task and write JSONL trace.
 
@@ -218,6 +223,12 @@ def run_task(
     model_time_s = 0.0
     tool_time_s = 0.0
 
+    # User agent state
+    user_agent_rounds = 0
+    ua_cfg = task.user_agent
+    ua_enabled = ua_cfg.enabled and user_agent is not None
+    ua_max_rounds = ua_cfg.max_rounds if ua_enabled else 0
+
     _log(f"[start] task={task.task_id} model={provider.model_id} trace={trace_path.name}")
     _log(f"[config] max_turns={task.environment.max_turns} timeout={task.environment.timeout_seconds}s sandbox_tools={sandbox_tools}")
     if agent_tool_list:
@@ -235,6 +246,8 @@ def run_task(
         system_prompt = build_system_prompt(task, prompt_cfg, extra_tools=sandbox_tool_list)
         if model_cfg and model_cfg.system_prompt_prefix:
             system_prompt = model_cfg.system_prompt_prefix + "\n\n" + system_prompt
+        if ua_enabled and ua_cfg.system_prompt_suffix:
+            system_prompt = system_prompt + "\n\n" + ua_cfg.system_prompt_suffix
         user_content = _build_initial_user_content(
             task,
             trace_id=trace_id,
@@ -339,6 +352,20 @@ def run_task(
                     _log(f"  text: {text_preview}{'...' if len(text_blocks[0].text) > 120 else ''}")
 
                 if not tool_uses:
+                    if ua_enabled and user_agent_rounds < ua_max_rounds:
+                        ua_text = user_agent.generate_response(
+                            persona=ua_cfg.persona,
+                            conversation_messages=messages,
+                        )
+                        if ua_text is None:
+                            _log(f"[user-agent] user satisfied — ending at turn {turn_count}")
+                            break
+                        user_agent_rounds += 1
+                        ua_msg = Message(role="user", content=[TextBlock(text=f"[user_agent]\n{ua_text}")])
+                        messages.append(ua_msg)
+                        writer.write_event(TraceMessage(trace_id=trace_id, message=ua_msg))
+                        _log(f"[user-agent] round {user_agent_rounds}/{ua_max_rounds}: {ua_text[:100]}")
+                        continue
                     _log(f"[done] no tool calls — agent finished at turn {turn_count}")
                     break
 

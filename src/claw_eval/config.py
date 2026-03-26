@@ -139,6 +139,13 @@ class MediaConfig(BaseModel):
     tool_image_max_dimension: int = 768
 
 
+class UserAgentModelConfig(BaseModel):
+    """LLM configuration for simulated user agent."""
+    api_key: str | None = None
+    base_url: str = "https://openrouter.ai/api/v1"
+    model_id: str = "google/gemini-3-flash-preview"
+
+
 class Config(BaseModel):
     model: ModelConfig = ModelConfig()
     judge: JudgeConfig = JudgeConfig()
@@ -146,6 +153,7 @@ class Config(BaseModel):
     sandbox: SandboxConfig = SandboxConfig()
     prompt: PromptConfig = PromptConfig()
     media: MediaConfig = MediaConfig()
+    user_agent_model: UserAgentModelConfig = UserAgentModelConfig()
 
 
 def load_config(path: str | Path | None = None) -> Config:

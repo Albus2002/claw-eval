@@ -93,6 +93,14 @@ class ExpectedAction(BaseModel):
     required: bool = True
 
 
+class UserAgentTaskConfig(BaseModel):
+    """Per-task user agent simulation settings."""
+    enabled: bool = False
+    persona: str = ""
+    max_rounds: int = 3
+    system_prompt_suffix: str = ""
+
+
 class TaskDefinition(BaseModel):
     task_id: str
     task_name: str
@@ -111,6 +119,7 @@ class TaskDefinition(BaseModel):
     reference_solution: str = ""
     primary_dimensions: list[str] = Field(default_factory=list)
     tags: list[str] = Field(default_factory=list)
+    user_agent: UserAgentTaskConfig = Field(default_factory=UserAgentTaskConfig)
     sandbox_files: list[str] = Field(default_factory=list)
     sandbox_grader_files: list[str] = Field(default_factory=list)
     env_snapshot_files: list[str] = Field(default_factory=list)
