@@ -12,3 +12,20 @@ uv.lock
 model_traces/
 traces/
 traces_*/
+.vscode/
+CLAUDE.md
+*.sh
+
+tasks/*/fixtures/*.mp4
+tasks/*/fixtures/*.webm
+
+logs/
+
+docs/
+
+# Configs (contain API keys and internal endpoints)
+configs/
+
+0325_all_traces/
+0325_general_traces/
+
