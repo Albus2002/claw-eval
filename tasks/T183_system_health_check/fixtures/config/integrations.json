@@ -1,0 +1,73 @@
+[
+  {
+    "integration_id": "INT-1001",
+    "name": "Payment Gateway",
+    "type": "payment",
+    "status": "active",
+    "config": {
+      "endpoint": "https://pay.company.com/api/v2",
+      "timeout_ms": 5000,
+      "retry_count": 3
+    },
+    "error_rate": 0.02,
+    "last_updated": "2026-03-10",
+    "description": "Online payment gateway integration, handles order payment callbacks"
+  },
+  {
+    "integration_id": "INT-1002",
+    "name": "Email Service",
+    "type": "smtp",
+    "status": "error",
+    "config": {
+      "host": "smtp.company.com",
+      "port": 587,
+      "auth": "credentials"
+    },
+    "error_rate": 1.0,
+    "error_message": "SMTP authentication expired, last successful send: 2026-03-18",
+    "last_updated": "2026-03-18",
+    "description": "System email sending service, used for notifications, alerts, and report delivery"
+  },
+  {
+    "integration_id": "INT-1003",
+    "name": "Data Warehouse Sync",
+    "type": "etl",
+    "status": "active",
+    "config": {
+      "source": "production_db",
+      "target": "data_warehouse",
+      "sync_interval_minutes": 30
+    },
+    "error_rate": 0.28,
+    "last_updated": "2026-03-20",
+    "description": "Incremental sync from production database to data warehouse, used for reports and analytics"
+  },
+  {
+    "integration_id": "INT-1004",
+    "name": "Message Queue",
+    "type": "mq",
+    "status": "active",
+    "config": {
+      "broker": "rabbitmq.company.com:5672",
+      "vhost": "/production",
+      "prefetch_count": 10
+    },
+    "error_rate": 0.01,
+    "last_updated": "2026-03-22",
+    "description": "Asynchronous message queue, handles background tasks and event distribution"
+  },
+  {
+    "integration_id": "INT-1005",
+    "name": "Logging Service",
+    "type": "logging",
+    "status": "active",
+    "config": {
+      "endpoint": "https://log.company.com/ingest",
+      "buffer_size": 1000,
+      "flush_interval_seconds": 5
+    },
+    "error_rate": 0.005,
+    "last_updated": "2026-03-25",
+    "description": "Centralized log collection and storage service"
+  }
+]
