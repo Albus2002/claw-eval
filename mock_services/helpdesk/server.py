@@ -22,7 +22,7 @@ add_error_injection(app)
 
 FIXTURES_PATH = Path(os.environ.get(
     "HELPDESK_FIXTURES",
-    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T17zh_ticket_triage" / "fixtures" / "helpdesk" / "tickets.json"),
+    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T017zh_ticket_triage" / "fixtures" / "helpdesk" / "tickets.json"),
 ))
 
 _tickets: list[dict[str, Any]] = []

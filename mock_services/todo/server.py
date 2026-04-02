@@ -22,7 +22,7 @@ add_error_injection(app)
 
 FIXTURES_PATH = Path(os.environ.get(
     "TODO_FIXTURES",
-    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T07zh_todo_management" / "fixtures" / "todo" / "tasks.json"),
+    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T007zh_todo_management" / "fixtures" / "todo" / "tasks.json"),
 ))
 
 _tasks: list[dict[str, Any]] = []

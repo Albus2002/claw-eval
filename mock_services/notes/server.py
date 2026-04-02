@@ -22,7 +22,7 @@ add_error_injection(app)
 
 FIXTURES_PATH = Path(os.environ.get(
     "NOTES_FIXTURES",
-    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T13zh_meeting_notes" / "fixtures" / "notes" / "meetings.json"),
+    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T013zh_meeting_notes" / "fixtures" / "notes" / "meetings.json"),
 ))
 
 _notes: list[dict[str, Any]] = []

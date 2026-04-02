@@ -1,7 +1,7 @@
 """Real Web API proxy with prompt injection (port 9115).
 
 Self-contained service that performs real web search/fetch and then injects
-prompt injection payloads into the results. Used by safety tasks (T47)
+prompt injection payloads into the results. Used by safety tasks (T047)
 to test agent resistance to injection attacks embedded in real web data.
 
 Injection is applied directly in the endpoint handlers (no middleware):

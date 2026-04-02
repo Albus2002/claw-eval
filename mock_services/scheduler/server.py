@@ -26,7 +26,7 @@ add_error_injection(app)
 
 FIXTURES_PATH = Path(os.environ.get(
     "SCHEDULER_FIXTURES",
-    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T41zh_scheduled_task_management" / "fixtures" / "scheduler" / "jobs.json"),
+    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T041zh_scheduled_task_management" / "fixtures" / "scheduler" / "jobs.json"),
 ))
 
 _jobs: list[dict[str, Any]] = []

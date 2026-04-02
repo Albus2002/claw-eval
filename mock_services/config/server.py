@@ -27,7 +27,7 @@ add_error_injection(app)
 
 FIXTURES_PATH = Path(os.environ.get(
     "CONFIG_FIXTURES",
-    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T27zh_api_config_audit" / "fixtures" / "config" / "integrations.json"),
+    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T027zh_api_config_audit" / "fixtures" / "config" / "integrations.json"),
 ))
 
 _integrations: list[dict[str, Any]] = []

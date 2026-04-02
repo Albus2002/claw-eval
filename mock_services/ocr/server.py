@@ -59,7 +59,7 @@ def _load_fixtures():
             _ocr_text = ocr_file.read_text(encoding="utf-8")
             return
     # Fallback: look in the default task fixture location
-    default_path = Path(__file__).resolve().parents[2] / "tasks" / "T72_restaurant_menu_contact" / "fixtures" / "ocr" / "menu_ocr.txt"
+    default_path = Path(__file__).resolve().parents[2] / "tasks" / "T072_restaurant_menu_contact" / "fixtures" / "ocr" / "menu_ocr.txt"
     if default_path.exists():
         _ocr_text = default_path.read_text(encoding="utf-8")
 

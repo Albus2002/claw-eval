@@ -22,7 +22,7 @@ add_error_injection(app)
 
 FIXTURES_PATH = Path(os.environ.get(
     "KB_FIXTURES",
-    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T15zh_kb_search" / "fixtures" / "kb" / "articles.json"),
+    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T015zh_kb_search" / "fixtures" / "kb" / "articles.json"),
 ))
 
 _articles: list[dict[str, Any]] = []

@@ -22,7 +22,7 @@ add_error_injection(app)
 
 FIXTURES_PATH = Path(os.environ.get(
     "GMAIL_FIXTURES",
-    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T01zh_email_triage" / "fixtures" / "gmail" / "inbox.json"),
+    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T001zh_email_triage" / "fixtures" / "gmail" / "inbox.json"),
 ))
 
 # In-memory state

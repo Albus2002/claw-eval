@@ -22,7 +22,7 @@ add_error_injection(app)
 
 FIXTURES_PATH = Path(os.environ.get(
     "CALENDAR_FIXTURES",
-    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T03zh_calendar_scheduling" / "fixtures" / "calendar" / "events.json"),
+    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T003zh_calendar_scheduling" / "fixtures" / "calendar" / "events.json"),
 ))
 
 _events: list[dict[str, Any]] = []

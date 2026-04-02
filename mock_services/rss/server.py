@@ -22,7 +22,7 @@ add_error_injection(app)
 
 FIXTURES_PATH = Path(os.environ.get(
     "RSS_FIXTURES",
-    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T21zh_newsletter_curation" / "fixtures" / "rss" / "articles.json"),
+    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T021zh_newsletter_curation" / "fixtures" / "rss" / "articles.json"),
 ))
 
 _articles: list[dict[str, Any]] = []

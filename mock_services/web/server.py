@@ -32,12 +32,12 @@ add_error_injection(app)
 
 SEARCH_FIXTURES_PATH = Path(os.environ.get(
     "WEB_SEARCH_FIXTURES",
-    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T43zh_service_outage_research" / "fixtures" / "web" / "search_results.json"),
+    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T043zh_service_outage_research" / "fixtures" / "web" / "search_results.json"),
 ))
 
 FETCH_FIXTURES_PATH = Path(os.environ.get(
     "WEB_FETCH_FIXTURES",
-    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T43zh_service_outage_research" / "fixtures" / "web" / "pages.json"),
+    str(Path(__file__).resolve().parent.parent.parent / "tasks" / "T043zh_service_outage_research" / "fixtures" / "web" / "pages.json"),
 ))
 
 _search_items: list[dict[str, Any]] = []
