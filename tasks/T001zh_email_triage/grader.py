@@ -117,18 +117,21 @@ class EmailTriageGrader(AbstractGrader):
             'Output JSON only, msg_ids as keys, e.g. {"msg_001": "需回复", ...}'
         )
 
-        max_retries = 20
+        max_retries = 30
         for attempt in range(max_retries + 1):
             try:
                 resp = judge.client.chat.completions.create(
                     model=judge.model_id,
                     messages=[{"role": "user", "content": prompt}],
                     temperature=0.0,
-                    max_tokens=256,
+                    max_tokens=8192,
                 )
                 raw = resp.choices[0].message.content or "{}"
                 raw = re.sub(r"^```(?:json)?\s*", "", raw.strip())
                 raw = re.sub(r"\s*```$", "", raw.strip())
+                m = re.search(r'\{[^{}]*\}', raw)
+                if m:
+                    raw = m.group(0)
                 classifications = json.loads(raw)
 
                 correct = sum(
@@ -141,8 +144,10 @@ class EmailTriageGrader(AbstractGrader):
             except Exception as exc:
                 print(exc)
                 status = getattr(exc, "status_code", None) or getattr(exc, "code", None)
-                delay = min(2 ** (attempt + 1), 64) + random.uniform(0, 1)
+                delay = min(2 ** (attempt + 1), 16) + random.uniform(0, 1)
                 print(f"[judge-retry] ({status or type(exc).__name__}), "
                       f"attempt {attempt + 1}/{max_retries}, waiting {delay:.1f}s ...")
                 time.sleep(delay)
+
+        return 0.0
 

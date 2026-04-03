@@ -23,8 +23,7 @@ Ground Truth (5 items, 0.2 each):
 
 2. Total shots in this rally (0.2): 10 shots.
    - Exact (10): 0.2
-   - Within ±1 (9 or 11): 0.1
-   - Beyond: 0.0
+   - Otherwise: 0.0
 
 3. Server (0.2): Gauff.
    - Correct: 0.2

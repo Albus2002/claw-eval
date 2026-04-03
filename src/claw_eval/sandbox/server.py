@@ -409,13 +409,11 @@ def _resize_image(img, max_dim: int | None):
     return img.resize((new_w, new_h), getattr(__import__("PIL.Image", fromlist=["Image"]), "LANCZOS", 1))
 
 
-def _image_to_b64_jpeg(img, quality: int = 75) -> str:
-    """Convert PIL Image to base64-encoded JPEG."""
+def _image_to_b64_png(img) -> str:
+    """Convert PIL Image to base64-encoded PNG."""
     import io
     buf = io.BytesIO()
-    if img.mode in ("RGBA", "P"):
-        img = img.convert("RGB")
-    img.save(buf, format="JPEG", quality=quality)
+    img.save(buf, format="PNG")
     return base64.b64encode(buf.getvalue()).decode("ascii")
 
 
@@ -433,17 +431,17 @@ def _parse_screen_size(s: str | None) -> int | None:
 
 
 def _read_image(p: Path, screen_size: str | None) -> dict:
-    """Read an image file and return base64 JPEG."""
+    """Read an image file and return base64 PNG."""
     from PIL import Image
     img = Image.open(p)
     max_dim = _parse_screen_size(screen_size)
     img = _resize_image(img, max_dim)
-    b64 = _image_to_b64_jpeg(img)
+    b64 = _image_to_b64_png(img)
     w, h = img.size
     return {
         "media_type": "image",
         "metadata": {"width": w, "height": h, "format": p.suffix.lower()},
-        "frames": [{"index": 0, "timestamp_s": 0.0, "image_b64": b64, "mime_type": "image/jpeg"}],
+        "frames": [{"index": 0, "timestamp_s": 0.0, "image_b64": b64, "mime_type": "image/png"}],
         "text_summary": f"Image: {w}x{h}, {p.suffix.lower()}",
     }
 
@@ -534,14 +532,14 @@ def _read_video(p: Path, req: ReadMediaRequest) -> dict:
             img = Image.open(ff)
             if max_dim:
                 img = _resize_image(img, max_dim)
-            b64 = _image_to_b64_jpeg(img)
+            b64 = _image_to_b64_png(img)
             # Calculate timestamp
             timestamp = start + idx / max(req.fps, 0.001)
             frames.append({
                 "index": idx,
                 "timestamp_s": round(timestamp, 2),
                 "image_b64": b64,
-                "mime_type": "image/jpeg",
+                "mime_type": "image/png",
             })
 
     dur_str = f"{duration:.1f}s" if duration else "unknown"
@@ -596,12 +594,12 @@ def _read_pdf(p: Path, pages: str, dpi: int, max_dimension: int | None = None) -
     for idx, img in enumerate(images):
         if max_dimension:
             img = _resize_image(img, max_dimension)
-        b64 = _image_to_b64_jpeg(img)
+        b64 = _image_to_b64_png(img)
         frames.append({
             "index": idx,
             "timestamp_s": 0.0,
             "image_b64": b64,
-            "mime_type": "image/jpeg",
+            "mime_type": "image/png",
         })
 
     return {

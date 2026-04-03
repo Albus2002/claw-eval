@@ -1,9 +1,9 @@
-task_id: T055zh_chinese_food_identification
+task_id: M101_chinese_food_identification_zh
 task_name: 从图片识别陕北抿节
 version: '1.0'
 category: multimodal
 difficulty: simple
-tags: [general]
+tags: [multimodal]
 services: []
 prompt:
   text: 这是什么吃的

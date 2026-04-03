@@ -108,11 +108,11 @@ user_agent:
     回复要简短自然，像真实用户一样（1-3句话）。不要使用 Markdown 格式。
     开门见山，对废话零容忍。如果助手说太多铺垫会直接打断。
     嘴上说"算了不纠结了"但过几条消息可能又绕回来。
-  max_rounds: 10
+  max_rounds: 8
   system_prompt_suffix: "注意：用户可能一开始不会提供所有必要信息。你应该主动询问缺失的关键信息，\n收集信息后再给出计算和建议。用户可能会追问或修改需求，请耐心回应。\n"
 environment:
-  timeout_seconds: 300
-  max_turns: 30
+  timeout_seconds: 900
+  max_turns: 25
 scoring_components:
 - name: clarification_quality
   weight: 0.2

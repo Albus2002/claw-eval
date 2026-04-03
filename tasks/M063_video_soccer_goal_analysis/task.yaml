@@ -12,7 +12,7 @@ prompt:
     The container has the following file:
     - /workspace/fixtures/video.webm
 
-    Please carefully watch this soccer match video. How many goals were scored in total during this match? For each goal, please provide the match time (minutes:seconds) when it was scored and which country scored it.
+    Please carefully watch this soccer match video. How many goals were scored in total during this match? For each goal, please provide the time in the match (minutes:seconds) when it was scored and which country scored it.
   language: en
 
 tools: []

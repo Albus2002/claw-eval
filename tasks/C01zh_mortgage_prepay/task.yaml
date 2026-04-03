@@ -25,15 +25,15 @@ user_agent:
     - 手头攒了大概15万闲钱
     你不太懂缩短年限和减少月供的区别。你只知道自己的基本情况，
     如果助手问你不知道的专业问题（比如剩余本金精确数字），你可以说"不太清楚具体数字"。
-  max_rounds: 3
+  max_rounds: 8
   system_prompt_suffix: |
     注意：用户可能一开始不会提供所有必要信息。你应该主动询问缺失的关键信息
     （如贷款金额、利率、已还期数、还款方式等），收集信息后再给出计算和建议。
     用户可能会追问或修改需求，请耐心回应。
 
 environment:
-  timeout_seconds: 300
-  max_turns: 12
+  timeout_seconds: 900
+  max_turns: 25
 
 scoring_components:
   - name: clarification_quality

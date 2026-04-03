@@ -1,4 +1,4 @@
-task_id: M059_video_pingpong_smash_ace
+task_id: T146_video_pingpong_smash_ace
 task_name: Video Ping Pong Smash Ace Count
 version: "1.0"
 category: video_qa
@@ -39,8 +39,8 @@ judge_rubric: ""
 
 reference_solution: |
   Use sandbox_read_media to analyze the ping pong match video.
-  1 time where Chinese player smashed and opponent couldn't touch the ball.
-  Score before that point (Chinese first): 0:0.
+  2 times where Chinese player smashed and opponent couldn't touch the ball.
+  Scores before these points (Chinese first): 0:0, 3:1.
 
 primary_dimensions:
   - completion

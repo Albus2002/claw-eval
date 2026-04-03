@@ -9,7 +9,9 @@
     "assigned_to": "Liu Yang",
     "category": "notification",
     "description": "Haven't received any system notification emails since last week, including approval notices and alert emails. Already checked the spam folder and confirmed they're not being intercepted.",
-    "title": "Not receiving system notification emails"
+    "title": "Not receiving system notification emails",
+    "reporter": "Liu Yang",
+    "department": "notification"
   },
   {
     "ticket_id": "TK-1002",
@@ -21,7 +23,9 @@
     "assigned_to": "Wang Fang",
     "category": "data",
     "description": "Reports on the data dashboard are frequently delayed, sometimes by over half a day, affecting business decisions. Previously the data was near real-time.",
-    "title": "Data report delayed updates"
+    "title": "Data report delayed updates",
+    "reporter": "Wang Fang",
+    "department": "data"
   },
   {
     "ticket_id": "TK-1003",
@@ -33,7 +37,9 @@
     "assigned_to": "Chen Ming",
     "category": "reports",
     "description": "The report page shows blank with no data loading. It was working fine before; the problem started around March 21.",
-    "title": "Report page showing blank"
+    "title": "Report page showing blank",
+    "reporter": "Chen Ming",
+    "department": "reports"
   },
   {
     "ticket_id": "TK-1004",
@@ -45,7 +51,9 @@
     "assigned_to": "Zhang Wei",
     "category": "performance",
     "description": "Login has been taking over 10 seconds recently, it used to load instantly. Multiple colleagues report the same issue across all browsers.",
-    "title": "Login speed has become slow"
+    "title": "Login speed has become slow",
+    "reporter": "Zhang Wei",
+    "department": "performance"
   },
   {
     "ticket_id": "TK-1005",
@@ -57,7 +65,9 @@
     "assigned_to": "Zhao Lei",
     "category": "notification",
     "description": "Not receiving message push notifications on the mobile app anymore. Used to get push reminders for pending approvals.",
-    "title": "Mobile push notification anomaly"
+    "title": "Mobile push notification anomaly",
+    "reporter": "Zhao Lei",
+    "department": "notification"
   },
   {
     "ticket_id": "TK-1006",
@@ -69,6 +79,8 @@
     "assigned_to": "Li Hua",
     "category": "internal request",
     "description": "Department file storage space is nearly full, current utilization at 95%. Requesting expansion to 2TB.",
-    "title": "Request to increase storage space"
+    "title": "Request to increase storage space",
+    "reporter": "Li Hua",
+    "department": "internal request"
   }
 ]

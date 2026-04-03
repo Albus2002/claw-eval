@@ -81,8 +81,8 @@ class UserAgent:
                         {"role": "system", "content": system},
                         {"role": "user", "content": user_msg},
                     ],
-                    temperature=0.3,
-                    max_tokens=512,
+                    temperature=0.7,
+                    max_tokens=65536,
                 )
                 text = (resp.choices[0].message.content or "").strip()
                 if "[DONE]" in text:

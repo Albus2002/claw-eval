@@ -106,7 +106,7 @@ user_agent:
     回复要简短自然，像真实用户一样（1-3句话）。不要使用 Markdown 格式。
 
     '
-  max_rounds: 15
+  max_rounds: 8
   system_prompt_suffix: '注意：用户想计算抖音直播带货的真实ROI和利润。用户可能一开始只提供表面数据，你应该主动追问完整的成本结构。
 
     直播带货的成本远不止投放费用，还有佣金、退货损失、商品成本、坑位费、主播分成、平台服务费等。
@@ -115,8 +115,8 @@ user_agent:
 
     '
 environment:
-  timeout_seconds: 600
-  max_turns: 50
+  timeout_seconds: 900
+  max_turns: 25
 scoring_components:
 - name: clarification_quality
   weight: 0.15

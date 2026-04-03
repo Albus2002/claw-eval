@@ -33,11 +33,15 @@ class SandboxToolDispatcher:
         http_dispatcher: ToolDispatcher,
         *,
         sandbox_url: str | None = None,
+        max_images_per_turn: int = 16,
+        max_tool_images_total: int = 64,
     ) -> None:
         self._http = http_dispatcher
         self._sandbox_url = sandbox_url
         self._client = None  # lazy-init httpx client for remote mode
         self._total_images_injected = 0
+        self._max_per_turn = max_images_per_turn
+        self._max_total = max_tool_images_total
 
     # ---- public interface (same signature as ToolDispatcher) ---------------
 
@@ -144,11 +148,15 @@ class SandboxToolDispatcher:
         if is_media_response and not is_error:
             extra_images = []
             frames = body.get("frames", [])
+            remaining_total = max(0, self._max_total - self._total_images_injected)
+            budget = min(self._max_per_turn, remaining_total)
             for frame in frames:
+                if len(extra_images) >= budget:
+                    break
                 if "image_b64" in frame:
                     extra_images.append(ImageBlock(
                         data=frame["image_b64"],
-                        mime_type=frame.get("mime_type", "image/jpeg"),
+                        mime_type=frame.get("mime_type", "image/png"),
                     ))
                     self._total_images_injected += 1
             # Strip base64 data from text summary to save tokens

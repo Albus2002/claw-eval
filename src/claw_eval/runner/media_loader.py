@@ -148,16 +148,10 @@ def _maybe_resize_image(payload: bytes, *, max_bytes: int, max_dimension: int, m
     if max(img.size) > max_dimension:
         img.thumbnail((max_dimension, max_dimension))
 
-    quality = 85
     out = BytesIO()
-    img.save(out, format="JPEG", optimize=True, quality=quality)
+    img.save(out, format="PNG")
     encoded = out.getvalue()
-    while len(encoded) > max_bytes and quality >= 45:
-        quality -= 10
-        out = BytesIO()
-        img.save(out, format="JPEG", optimize=True, quality=quality)
-        encoded = out.getvalue()
-    return encoded, "image/jpeg"
+    return encoded, "image/png"
 
 
 def _decode_document(payload: bytes, resolved: Path) -> str:

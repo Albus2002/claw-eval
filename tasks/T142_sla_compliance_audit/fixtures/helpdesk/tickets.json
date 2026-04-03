@@ -10,7 +10,9 @@
     "first_response_at": "2026-03-25T08:35:00",
     "assigned_to": "Ma Qiang",
     "category": "technical",
-    "description": "Multiple services are reporting database connection timeouts, already impacting production business"
+    "description": "Multiple services are reporting database connection timeouts, already impacting production business",
+    "reporter": "Ma Qiang",
+    "department": "technical"
   },
   {
     "ticket_id": "TK-702",
@@ -23,7 +25,9 @@
     "assigned_to": "Li Hua",
     "category": "technical",
     "description": "Exporting CSV returns 500 error, has persisted for one day",
-    "title": "Report export function error"
+    "title": "Report export function error",
+    "reporter": "Li Hua",
+    "department": "technical"
   },
   {
     "ticket_id": "TK-703",
@@ -36,7 +40,9 @@
     "assigned_to": "Zhang Wei",
     "category": "technical",
     "description": "Permission changes made on the admin page do not take effect",
-    "title": "User permissions cannot be modified"
+    "title": "User permissions cannot be modified",
+    "reporter": "Zhang Wei",
+    "department": "technical"
   },
   {
     "ticket_id": "TK-704",
@@ -49,7 +55,9 @@
     "assigned_to": "Zhou Ming",
     "category": "UI",
     "description": "Some pages on iOS have broken layouts",
-    "title": "Mobile page display abnormality"
+    "title": "Mobile page display abnormality",
+    "reporter": "Zhou Ming",
+    "department": "UI"
   },
   {
     "ticket_id": "TK-705",
@@ -62,7 +70,9 @@
     "assigned_to": "Zhao Lei",
     "category": "inquiry",
     "description": "Would like to learn about the newly launched batch operations feature",
-    "title": "New feature usage inquiry"
+    "title": "New feature usage inquiry",
+    "reporter": "Zhao Lei",
+    "department": "inquiry"
   },
   {
     "ticket_id": "TK-706",
@@ -76,6 +86,8 @@
     "category": "internal",
     "description": "Set up test environment for new version",
     "internal": true,
-    "title": "Internal test environment setup"
+    "title": "Internal test environment setup",
+    "reporter": "Ma Qiang",
+    "department": "internal"
   }
 ]

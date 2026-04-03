@@ -2,7 +2,7 @@
 
 from claw_eval.graders.base import load_peer_grader
 
-_Base = load_peer_grader("T051zh_su7_price_from_image")
+_Base = load_peer_grader("M099_su7_price_from_image_zh")
 
 
 class SU7PriceFromImageGraderEN(_Base):

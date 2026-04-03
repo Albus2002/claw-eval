@@ -166,6 +166,24 @@ def _collect_env_snapshot(sandbox_url: str, task) -> dict:
                 snapshot[f"cmd:{cmd}"] = {"error": str(exc)}
                 print(f"[WARNING] env_snapshot command failed: {cmd}: {exc}")
 
+        def _normalize_read_response(data: dict) -> dict:
+            """Convert media-format /read responses to the standard encoding/content format.
+
+            The /read endpoint returns a media-format response for image files
+            (with "frames" containing image_b64) instead of the simple
+            {"encoding": "base64", "content": ...} that _save_env_snapshot and
+            graders expect.  Extract the raw image data from the first frame.
+            """
+            if data.get("frames") and not data.get("encoding"):
+                frames = data["frames"]
+                if frames and frames[0].get("image_b64"):
+                    return {
+                        "content": frames[0]["image_b64"],
+                        "encoding": "base64",
+                        "mime_type": frames[0].get("mime_type", "image/png"),
+                    }
+            return data
+
         # Collect files AFTER commands (commands may generate the files)
         for pattern in getattr(task, "env_snapshot_files", []):
             try:
@@ -182,7 +200,7 @@ def _collect_env_snapshot(sandbox_url: str, task) -> dict:
                                 f"{sandbox_url}/read",
                                 json={"path": f["path"]},
                             )
-                            snapshot[f"file:{f['path']}"] = resp2.json()
+                            snapshot[f"file:{f['path']}"] = _normalize_read_response(resp2.json())
                         except Exception as exc:
                             snapshot[f"file:{f['path']}"] = {"error": str(exc)}
                             print(f"[WARNING] env_snapshot file read failed: {f['path']}: {exc}")
@@ -191,7 +209,7 @@ def _collect_env_snapshot(sandbox_url: str, task) -> dict:
                         f"{sandbox_url}/read",
                         json={"path": pattern},
                     )
-                    snapshot[f"file:{pattern}"] = resp.json()
+                    snapshot[f"file:{pattern}"] = _normalize_read_response(resp.json())
             except Exception as exc:
                 snapshot[f"file:{pattern}"] = {"error": str(exc)}
                 print(f"[WARNING] env_snapshot file failed: {pattern}: {exc}")
@@ -214,7 +232,7 @@ def _save_env_snapshot(snapshot: dict, trace_path: Path, task_id: str) -> None:
     if not snapshot:
         return
 
-    snapshot_dir = trace_path.parent / f"{task_id}_snapshot"
+    snapshot_dir = trace_path.parent / f"{trace_path.stem}_snapshot"
     snapshot_dir.mkdir(parents=True, exist_ok=True)
 
     index: dict = {"files": [], "commands": []}

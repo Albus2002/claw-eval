@@ -10,7 +10,9 @@
     "first_response_at": "2026-03-25T08:35:00",
     "assigned_to": "马强",
     "category": "技术",
-    "description": "多个服务报数据库连接超时，已影响线上业务"
+    "description": "多个服务报数据库连接超时，已影响线上业务",
+    "reporter": "马强",
+    "department": "技术"
   },
   {
     "ticket_id": "TK-702",
@@ -23,7 +25,9 @@
     "assigned_to": "李华",
     "category": "技术",
     "description": "导出CSV时报500错误，已持续一天",
-    "title": "报表导出功能异常"
+    "title": "报表导出功能异常",
+    "reporter": "李华",
+    "department": "技术"
   },
   {
     "ticket_id": "TK-703",
@@ -36,7 +40,9 @@
     "assigned_to": "张伟",
     "category": "技术",
     "description": "管理员页面修改权限后不生效",
-    "title": "用户权限无法修改"
+    "title": "用户权限无法修改",
+    "reporter": "张伟",
+    "department": "技术"
   },
   {
     "ticket_id": "TK-704",
@@ -49,7 +55,9 @@
     "assigned_to": "周明",
     "category": "UI",
     "description": "iOS端部分页面布局错乱",
-    "title": "移动端页面显示异常"
+    "title": "移动端页面显示异常",
+    "reporter": "周明",
+    "department": "UI"
   },
   {
     "ticket_id": "TK-705",
@@ -62,7 +70,9 @@
     "assigned_to": "赵蕾",
     "category": "咨询",
     "description": "想了解新上线的批量操作功能",
-    "title": "新功能使用咨询"
+    "title": "新功能使用咨询",
+    "reporter": "赵蕾",
+    "department": "咨询"
   },
   {
     "ticket_id": "TK-706",
@@ -76,6 +86,8 @@
     "category": "内部",
     "description": "搭建新版本测试环境",
     "internal": true,
-    "title": "内部测试环境搭建"
+    "title": "内部测试环境搭建",
+    "reporter": "马强",
+    "department": "内部"
   }
 ]

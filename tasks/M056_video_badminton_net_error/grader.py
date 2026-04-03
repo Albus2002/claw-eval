@@ -18,13 +18,11 @@ Ground Truth (2 items):
 
 1. Korean player net errors (0.5): 1 time.
    - Exact (1): 0.5
-   - Off by 1 (0 or 2): 0.25
-   - Beyond: 0.0
+   - Otherwise: 0.0
 
 2. Japanese player net errors (0.5): 3 times.
    - Exact (3): 0.5
-   - Off by 1 (2 or 4): 0.25
-   - Beyond: 0.0
+   - Otherwise: 0.0
 
 Final score = sum of both items (0.0-1.0)."""
 

@@ -73,7 +73,7 @@ class LLMJudge:
             f"## Actions Taken\n{actions_summary}\n\n"
             f"## Rubric\n{rubric}"
         )
-        max_retries = 20
+        max_retries = 30
         last_exc: Exception | None = None
         for attempt in range(max_retries + 1):
             try:
@@ -96,15 +96,13 @@ class LLMJudge:
                 try:
                     parsed = json.loads(raw)
                     score, reasoning = parsed["score"], parsed["reasoning"]
-                except json.JSONDecodeError:
+                except (json.JSONDecodeError, KeyError):
                     # Fallback: extract score and reasoning directly
                     score_m = re.search(r'"score"\s*:\s*([0-9.]+)', raw)
                     reason_m = re.search(r'"reasoning"\s*:\s*"((?:[^"\\]|\\.)*)"', raw)
                     if score_m:
-                        parsed = {
-                            "score": float(score_m.group(1)),
-                            "reasoning": reason_m.group(1) if reason_m else "",
-                        }
+                        score = float(score_m.group(1))
+                        reasoning = reason_m.group(1) if reason_m else ""
                     else:
                         raise json.JSONDecodeError("No score found in raw", raw, 0)
 
@@ -179,7 +177,7 @@ class LLMJudge:
                     "image_url": {"url": f"data:image/png;base64,{img_b64}"},
                 })
 
-        max_retries = 20
+        max_retries = 30
         last_exc: Exception | None = None
         for attempt in range(max_retries + 1):
             try:
@@ -201,7 +199,7 @@ class LLMJudge:
                 try:
                     parsed = json.loads(raw)
                     score, reasoning = parsed["score"], parsed["reasoning"]
-                except json.JSONDecodeError:
+                except (json.JSONDecodeError, KeyError):
                     score_m = re.search(r'"score"\s*:\s*([0-9.]+)', raw)
                     reason_m = re.search(r'"reasoning"\s*:\s*"((?:[^"\\]|\\.)*)"', raw)
                     if score_m:

@@ -8,7 +8,8 @@
     "status": "active",
     "contract_end": "2027-03-31",
     "sales_rep": "Director Zhao",
-    "notes": "Core key account, uses advanced data analytics + custom modules, strong demand for AI quality inspection"
+    "notes": "Core key account, uses advanced data analytics + custom modules, strong demand for AI quality inspection",
+    "contact_person": "Director Zhao"
   },
   {
     "customer_id": "CUS-1202",
@@ -19,7 +20,8 @@
     "status": "active",
     "contract_end": "2026-12-31",
     "sales_rep": "Director Zhao",
-    "notes": "VIP customer, currently evaluating Competitor A's AI features, renewal at risk"
+    "notes": "VIP customer, currently evaluating Competitor A's AI features, renewal at risk",
+    "contact_person": "Director Zhao"
   },
   {
     "customer_id": "CUS-1203",
@@ -30,7 +32,8 @@
     "status": "active",
     "contract_end": "2026-09-30",
     "sales_rep": "Director Zhao",
-    "notes": "Standard customer, interested in upgrading, focusing on MES integration"
+    "notes": "Standard customer, interested in upgrading, focusing on MES integration",
+    "contact_person": "Director Zhao"
   },
   {
     "customer_id": "CUS-1204",
@@ -41,7 +44,8 @@
     "status": "active",
     "contract_end": "2027-06-30",
     "sales_rep": "Director Wang",
-    "notes": "Tier-A hospital group, uses EMR data analytics module, expansion potential under favorable policies"
+    "notes": "Tier-A hospital group, uses EMR data analytics module, expansion potential under favorable policies",
+    "contact_person": "Director Wang"
   },
   {
     "customer_id": "CUS-1205",
@@ -52,7 +56,8 @@
     "status": "active",
     "contract_end": "2026-08-31",
     "sales_rep": "Director Wang",
-    "notes": "Community healthcare facility, standard edition user, interested in hybrid cloud deployment"
+    "notes": "Community healthcare facility, standard edition user, interested in hybrid cloud deployment",
+    "contact_person": "Director Wang"
   },
   {
     "customer_id": "CUS-1206",
@@ -63,7 +68,8 @@
     "status": "active",
     "contract_end": "2026-07-31",
     "sales_rep": "Director Li",
-    "notes": "K12 education institution, uses student data analytics platform"
+    "notes": "K12 education institution, uses student data analytics platform",
+    "contact_person": "Director Li"
   },
   {
     "customer_id": "CUS-1207",
@@ -74,7 +80,8 @@
     "status": "churned",
     "contract_end": "2026-02-28",
     "sales_rep": "Director Li",
-    "notes": "Churned, reason: budget cuts, switched to free solution"
+    "notes": "Churned, reason: budget cuts, switched to free solution",
+    "contact_person": "Director Li"
   },
   {
     "customer_id": "CUS-1208",
@@ -85,6 +92,7 @@
     "status": "active",
     "contract_end": "2027-12-31",
     "sales_rep": "Director Zhao",
-    "notes": "One of the largest customers, uses full compliance + analytics suite, compliance certification is key renewal factor"
+    "notes": "One of the largest customers, uses full compliance + analytics suite, compliance certification is key renewal factor",
+    "contact_person": "Director Zhao"
   }
 ]

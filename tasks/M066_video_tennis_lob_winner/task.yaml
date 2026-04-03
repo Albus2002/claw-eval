@@ -12,7 +12,7 @@ prompt:
     The container has the following file:
     - /workspace/fixtures/video.webm
 
-    How many times in the video did a player hit a defensive lob to the opponent's baseline that resulted in a winner (i.e., the opponent failed to reach the ball)?
+    How many times in the video did a player hit a defensive lob to the opponent's baseline that resulted in a winner (i.e., the player wins the point and the opponent failed to reach the ball)?
     For each such instance, please provide the name of the player who scored, the name of the opposing player, who served that point, and the total number of shots hit during that point.
   language: en
 

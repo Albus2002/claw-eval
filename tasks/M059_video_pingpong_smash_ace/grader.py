@@ -1,4 +1,4 @@
-"""M059_video_pingpong_smash_ace grader — ping pong smash ace count."""
+"""T146_video_pingpong_smash_ace grader — ping pong smash ace count."""
 
 from __future__ import annotations
 
@@ -11,21 +11,25 @@ from claw_eval.models.trace import DimensionScores, MediaLoad, ToolDispatch, Tra
 
 
 class VideoPingpongSmashAceGrader(AbstractGrader, MultimodalGraderMixin):
-    """Grade ping pong smash ace: count (0.5) + score before each (0.5)."""
+    """Grade ping pong smash ace: count (0.4) + scores before each (0.3 each)."""
 
     RUBRIC = """\
-Ground Truth (2 items):
+Ground Truth (3 items):
 
-1. Number of times Chinese player smashed and opponent couldn't touch the ball (0.5): \
-1 time.
-   - Exact (1): 0.5
+1. Number of times Chinese player smashed and opponent couldn't touch the ball (0.4): \
+2 times.
+   - Exact (2): 0.4
+   - Otherwise: 0.0
+
+2. Score before the first such point, Chinese player first (0.3): 0:0.
+   - Correct (0:0): 0.3
    - Wrong: 0.0
 
-2. Score before that point, Chinese player first (0.5): 0:0.
-   - Correct (0:0): 0.5
+3. Score before the second such point, Chinese player first (0.3): 3:1.
+   - Correct (3:1): 0.3
    - Wrong: 0.0
 
-Final score = sum of both items (0.0-1.0)."""
+Final score = sum of all items (0.0-1.0)."""
 
     def grade(
         self,

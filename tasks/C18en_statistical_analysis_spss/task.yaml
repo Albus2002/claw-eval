@@ -136,15 +136,15 @@ user_agent:
     - You''re anxious about the manuscript timeline and will mention it: "I have a revise-and-resubmit due in three weeks"
 
     '
-  max_rounds: 15
+  max_rounds: 8
   system_prompt_suffix: 'Note: The user may not provide all necessary information upfront. You should proactively ask for missing key information (design structure, sample sizes, missing data handling,
     assumption checks), then provide diagnosis and recommendations after collecting it. The user may follow up or change requirements — respond patiently. Use computation tools when calculating degrees
     of freedom, effect sizes, or power estimates.
 
     '
 environment:
-  timeout_seconds: 600
-  max_turns: 50
+  timeout_seconds: 900
+  max_turns: 25
 scoring_components:
 - name: clarification_quality
   weight: 0.15

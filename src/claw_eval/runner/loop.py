@@ -60,14 +60,6 @@ def _make_local_tool_result(tool_use, text: str, is_error: bool = False) -> Tool
     )
 
 
-def _inject_todo_reminder(messages: list[Message]) -> None:
-    """Append a gentle reminder to update the todo list as a user message."""
-    reminder = Message(
-        role="user",
-        content=[TextBlock(text="<reminder>You have an active todo list. Consider updating it.</reminder>")],
-    )
-    messages.append(reminder)
-
 
 def _build_initial_user_content(
     task: TaskDefinition,
@@ -199,7 +191,13 @@ def run_task(
         existing_names = {t.name for t in task.tools}
         sandbox_tool_list = [t for t in SANDBOX_TOOLS if t.name not in existing_names]
         task_tools = list(task.tools) + sandbox_tool_list
-        dispatcher = SandboxToolDispatcher(http_dispatcher, sandbox_url=sandbox_url)
+        _mcfg = media_cfg or MediaConfig()
+        dispatcher = SandboxToolDispatcher(
+            http_dispatcher,
+            sandbox_url=sandbox_url,
+            max_images_per_turn=_mcfg.max_images_per_turn,
+            max_tool_images_total=_mcfg.max_tool_images_total,
+        )
     else:
         task_tools = task.tools
         dispatcher = http_dispatcher
@@ -213,7 +211,6 @@ def run_task(
 
     # Initialise TodoManager and compact state
     todo_mgr = TodoManager() if task.environment.enable_todo else None
-    rounds_since_todo = 0
     auto_compact_count = 0
     context_window = model_cfg.context_window if model_cfg else 200_000
 
@@ -315,17 +312,6 @@ def run_task(
                     ))
                     _log(f"[auto-compact] done: {tokens_before} → {tokens_after} tokens, {msgs_before} → {len(messages)} msgs")
 
-                # --- Todo nag reminder ---
-                if (
-                    todo_mgr
-                    and todo_mgr.items
-                    and task.environment.todo_nag_rounds > 0
-                    and rounds_since_todo >= task.environment.todo_nag_rounds
-                ):
-                    _inject_todo_reminder(messages)
-                    rounds_since_todo = 0
-                    _log("[todo] injected nag reminder")
-
                 # Call model
                 _log(f"[turn {turn_count + 1}/{task.environment.max_turns}] calling model ...")
                 model_t0 = time.monotonic()
@@ -383,7 +369,6 @@ def run_task(
                         result_text = todo_mgr.update(tu.input.get("items", []))
                         result = _make_local_tool_result(tu, result_text)
                         result_blocks.append(result)
-                        rounds_since_todo = 0
                         _log(f"  <- todo: OK (local)")
                         continue
 
@@ -431,10 +416,6 @@ def run_task(
                     tool_time_s += dispatch_event.latency_ms / 1000.0
                     status_tag = "OK" if not result.is_error else "ERR"
                     _log(f"  <- {tu.name}: {status_tag} ({dispatch_event.latency_ms:.0f}ms)")
-
-                # Track rounds since last todo update
-                if has_non_agent_tool:
-                    rounds_since_todo += 1
 
                 # Message 1: tool results (becomes role:tool in OpenAI format)
                 tool_msg = Message(role="user", content=result_blocks)

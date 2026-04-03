@@ -132,15 +132,15 @@ user_agent:
     如果助手没有追问这些深入信息，你也不要主动全部倒出来。
 
     '
-  max_rounds: 15
+  max_rounds: 8
   system_prompt_suffix: '注意：用户可能一开始不会提供所有必要信息。你应该主动询问缺失的关键信息，
 
     收集信息后再给出计算和建议。用户可能会追问或修改需求，请耐心回应。
 
     '
 environment:
-  timeout_seconds: 600
-  max_turns: 50
+  timeout_seconds: 900
+  max_turns: 25
 scoring_components:
 - name: clarification_quality
   weight: 0.2

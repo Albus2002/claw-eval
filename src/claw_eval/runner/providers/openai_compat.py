@@ -312,7 +312,8 @@ class OpenAICompatProvider:
                 if not retryable or attempt == max_retries:
                     if has_multimodal_input:
                         raise RuntimeError(
-                            "Model endpoint rejected multimodal input. "
+                            f"Model endpoint rejected multimodal input "
+                            f"({type(exc).__name__}: {exc}). "
                             "Check provider support for image/audio/video message parts, "
                             "or set media.strict_mode=false to allow skips."
                         ) from exc

@@ -14,7 +14,7 @@ prompt:
 
     Watch the video and answer: how many set points in total did the player wearing a white top fail to convert across all three sets? How many set points did he fail to convert in the first set, second set, and third set respectively?
 
-    Note: A set point is a score situation where a player needs only one more point to win the current set. Failing to convert a set point means the player had a set point but did not win that point, losing the opportunity to clinch the set.
+    Note: A set point is a score situation where a player needs only one more point to win the current set. Failing to convert a set point means the player had a set point but did not win that point.
   language: en
 
 tools: []
