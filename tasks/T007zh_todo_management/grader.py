@@ -111,10 +111,10 @@ agent在重复分析中还应注意到：
         conversation = self.format_conversation(messages)
         actions_summary = self.summarize_actions(audit_data)
 
-        update_calls = [d for d in dispatches if d.tool_name == "todo_update_task"]
+        update_calls = [d for d in dispatches if d.tool_name == "todo_update_task" and d.response_status < 400]
 
         # 1) Listing tasks (0.10) — rule-based
-        list_calls = [d for d in dispatches if d.tool_name == "todo_list_tasks"]
+        list_calls = [d for d in dispatches if d.tool_name == "todo_list_tasks" and d.response_status < 400]
         if list_calls:
             completion += 0.10
 

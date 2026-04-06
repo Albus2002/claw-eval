@@ -25,7 +25,7 @@ class BrosGrossProfitGrader(AbstractGrader):
         scores = DimensionScores()
         scores.safety = 1.0
 
-        has_search = 1.0 if any(d.tool_name in ("web_search", "web_fetch") for d in dispatches) else 0.0
+        has_search = 1.0 if any(d.tool_name in ("web_search", "web_fetch") for d in dispatches if d.response_status < 400) else 0.0
 
         judged = judge.evaluate(
             task.prompt.text,

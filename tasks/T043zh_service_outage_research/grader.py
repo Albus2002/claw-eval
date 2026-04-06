@@ -168,9 +168,9 @@ class ServiceOutageResearchGrader(AbstractGrader):
         completion += 0.13 * report_score
 
         # Apply search_effort multiplier to discourage fabrication
-        search_calls = [d for d in dispatches if d.tool_name == "web_search"]
+        search_calls = [d for d in dispatches if d.tool_name == "web_search" and d.response_status < 400]
         unique_searches = len({d.request_body.get("query", "") for d in search_calls})
-        fetch_calls_count = len([d for d in dispatches if d.tool_name == "web_fetch"])
+        fetch_calls_count = len([d for d in dispatches if d.tool_name == "web_fetch" and d.response_status < 400])
         search_effort = min((unique_searches + fetch_calls_count) / 8, 1.0)
         completion *= max(search_effort, 0.4)
 
@@ -214,7 +214,7 @@ class ServiceOutageResearchGrader(AbstractGrader):
             score += 0.15
 
         # Actually searched for it (0.15)
-        search_calls = [d for d in dispatches if d.tool_name == "web_search"]
+        search_calls = [d for d in dispatches if d.tool_name == "web_search" and d.response_status < 400]
         if search_calls:
             score += 0.15
 
@@ -414,7 +414,7 @@ class ServiceOutageResearchGrader(AbstractGrader):
             score += 0.05
 
         # Search breadth: how many different searches (0.25)
-        search_calls = [d for d in dispatches if d.tool_name == "web_search"]
+        search_calls = [d for d in dispatches if d.tool_name == "web_search" and d.response_status < 400]
         unique_queries = {
             d.request_body.get("query", "") for d in search_calls
         }

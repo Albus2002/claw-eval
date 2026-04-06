@@ -48,7 +48,7 @@ class PinbenchAdaptedGrader(AbstractGrader):
         if self.REQUIRED_TOOLS:
             tool_score_parts = []
             for tool_name, min_calls in self.REQUIRED_TOOLS.items():
-                call_count = sum(1 for d in dispatches if d.tool_name == tool_name)
+                call_count = sum(1 for d in dispatches if d.tool_name == tool_name and d.response_status < 400)
                 tool_score_parts.append(min(call_count / max(min_calls, 1), 1.0))
             components.append(sum(tool_score_parts) / len(tool_score_parts))
 

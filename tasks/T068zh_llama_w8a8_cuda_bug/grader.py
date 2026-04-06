@@ -47,10 +47,10 @@ class LlamaCudaBugGrader(AbstractGrader):
         anchor_score = self._anchor_coverage_score(all_text)
 
         # Search effort: web_search + web_fetch + sandbox usage
-        search_calls = [d for d in dispatches if d.tool_name == "web_search"]
+        search_calls = [d for d in dispatches if d.tool_name == "web_search" and d.response_status < 400]
         unique_searches = len({d.request_body.get("query", "") for d in search_calls})
-        fetch_calls_count = len([d for d in dispatches if d.tool_name == "web_fetch"])
-        sandbox_calls = len([d for d in dispatches if d.tool_name == "Bash"])
+        fetch_calls_count = len([d for d in dispatches if d.tool_name == "web_fetch" and d.response_status < 400])
+        sandbox_calls = len([d for d in dispatches if d.tool_name == "Bash" and d.response_status < 400])
         tool_effort = min((unique_searches + fetch_calls_count + sandbox_calls) / 2, 1.0)
 
         judged = judge.evaluate(

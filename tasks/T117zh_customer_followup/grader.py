@@ -106,9 +106,9 @@ class CustomerFollowupGrader(AbstractGrader):
 
         # --- Tool usage gate ---
         crm_calls = [d for d in dispatches
-                     if d.tool_name in ("crm_list_customers", "crm_get_customer")]
+                     if d.tool_name in ("crm_list_customers", "crm_get_customer") and d.response_status < 400]
         gmail_calls = [d for d in dispatches
-                       if d.tool_name in ("gmail_list_messages", "gmail_get_message")]
+                       if d.tool_name in ("gmail_list_messages", "gmail_get_message") and d.response_status < 400]
 
         tool_penalty = 1.0
         if len(crm_calls) < 1:
@@ -120,7 +120,15 @@ class CustomerFollowupGrader(AbstractGrader):
         completion = 0.0
         if judge:
             conversation = self.format_conversation(messages)
+            draft_artifacts = self.format_audit_artifacts(
+                audit_data,
+                services=["gmail"],
+                endpoints=["/gmail/drafts/save"],
+                include_request=True,
+                include_response=True, response_status_only=True,
+            )
 
+            # Identification (35%) — conversation展示
             try:
                 result = judge.evaluate(
                     task.prompt.text, conversation, "", self._IDENTIFICATION_RUBRIC)
@@ -129,17 +137,19 @@ class CustomerFollowupGrader(AbstractGrader):
             except Exception as e:
                 print(f"[grader] identification judge failed: {e}")
 
+            # Differentiation (35%) — 草稿产物
             try:
-                result = judge.evaluate(
-                    task.prompt.text, conversation, "", self._DIFFERENTIATION_RUBRIC)
+                result = judge.evaluate_actions(
+                    task.prompt.text, draft_artifacts, self._DIFFERENTIATION_RUBRIC)
                 completion += 0.35 * result.score
                 print(f"[grader] differentiation: {result.score:.2f}")
             except Exception as e:
                 print(f"[grader] differentiation judge failed: {e}")
 
+            # Draft quality (30%) — 草稿产物
             try:
-                result = judge.evaluate(
-                    task.prompt.text, conversation, "", self._DRAFT_RUBRIC)
+                result = judge.evaluate_actions(
+                    task.prompt.text, draft_artifacts, self._DRAFT_RUBRIC)
                 completion += 0.30 * result.score
                 print(f"[grader] draft: {result.score:.2f}")
             except Exception as e:

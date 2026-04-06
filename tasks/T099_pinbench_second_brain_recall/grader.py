@@ -28,7 +28,7 @@ class PinbenchSecondBrainRecallGrader(AbstractGrader):
             "neondb" in lower and "distributed key-value store" in lower,
             "purple elephant sunrise" in lower,
         ]
-        tool_score = 1.0 if any(d.tool_name == "notes_get" for d in dispatches) else 0.0
+        tool_score = 1.0 if any(d.tool_name == "notes_get" for d in dispatches if d.response_status < 400) else 0.0
         scores.completion = round((sum(facts) / len(facts) + tool_score) / 2, 2)
         scores.robustness = self.compute_robustness(dispatches)
         scores.efficiency_turns = len([m for m in messages if m.message.role == "assistant"])

@@ -134,25 +134,25 @@ class SupplyChainInvestigationGrader(AbstractGrader):
         # Helpdesk: must read tickets
         helpdesk_calls = [
             d for d in dispatches
-            if d.tool_name in ("helpdesk_list_tickets", "helpdesk_get_ticket")
+            if d.tool_name in ("helpdesk_list_tickets", "helpdesk_get_ticket") and d.response_status < 400
         ]
 
         # Inventory: must check stock
         inventory_calls = [
             d for d in dispatches
-            if d.tool_name in ("inventory_list_items", "inventory_get_item")
+            if d.tool_name in ("inventory_list_items", "inventory_get_item") and d.response_status < 400
         ]
 
         # Finance: must check transactions
         finance_calls = [
             d for d in dispatches
-            if d.tool_name in ("finance_list_transactions", "finance_get_transaction")
+            if d.tool_name in ("finance_list_transactions", "finance_get_transaction") and d.response_status < 400
         ]
 
         # CRM: must check supplier status
         crm_calls = [
             d for d in dispatches
-            if d.tool_name in ("crm_list_customers", "crm_get_customer")
+            if d.tool_name in ("crm_list_customers", "crm_get_customer") and d.response_status < 400
         ]
 
         tool_penalty = 1.0
@@ -169,12 +169,12 @@ class SupplyChainInvestigationGrader(AbstractGrader):
         sup_checked = any(
             d.tool_name == "crm_get_customer"
             and d.request_body.get("customer_id") == self.ROOT_CAUSE_SUPPLIER
-            for d in dispatches
+            for d in dispatches if d.response_status < 400
         )
         if not sup_checked:
             # Also accept if they listed all customers (which would show SUP-1001)
             listed_crm = any(
-                d.tool_name == "crm_list_customers" for d in dispatches
+                d.tool_name == "crm_list_customers" for d in dispatches if d.response_status < 400
             )
             if not listed_crm:
                 tool_penalty *= 0.8  # Mild penalty for not checking supplier directly

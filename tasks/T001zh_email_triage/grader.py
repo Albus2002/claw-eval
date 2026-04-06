@@ -62,8 +62,8 @@ class EmailTriageGrader(AbstractGrader):
 
         # 2) Tool usage: list + get (weight 0.15)
         tool_score = 0.0
-        list_calls = [d for d in dispatches if d.tool_name == "gmail_list_messages"]
-        get_calls = [d for d in dispatches if d.tool_name == "gmail_get_message"]
+        list_calls = [d for d in dispatches if d.tool_name == "gmail_list_messages" and d.response_status < 400]
+        get_calls = [d for d in dispatches if d.tool_name == "gmail_get_message" and d.response_status < 400]
         if list_calls:
             tool_score += 0.5
         if get_calls:

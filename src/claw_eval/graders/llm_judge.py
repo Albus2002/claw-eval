@@ -25,6 +25,15 @@ Follow the rubric to score the assistant's response on a 0.0-1.0 scale.
 Respond with JSON only: {"score": <float>, "reasoning": "<brief explanation>"}
 """
 
+_ACTIONS_SYSTEM_PROMPT = """\
+You are an evaluation judge for an AI agent's actions.
+You will be given a task prompt, a record of actions the agent actually performed \
+(extracted from the server-side audit log, not from the agent's self-report), \
+and a rubric.
+Follow the rubric to score the quality of the agent's actions on a 0.0-1.0 scale.
+Respond with JSON only: {"score": <float>, "reasoning": "<brief explanation>"}
+"""
+
 _VISUAL_SYSTEM_PROMPT = """\
 You are a STRICT visual evaluation judge. Your job is to compare candidate images \
 against reference images and/or a detailed rubric, then assign a score from 0.0 to 1.0.
@@ -112,6 +121,74 @@ class LLMJudge:
                 )
                 self._call_log.append({
                     "method": "evaluate",
+                    "rubric_preview": rubric[:300],
+                    "score": result.score,
+                    "reasoning": result.reasoning,
+                    "timestamp": _now(),
+                })
+                return result
+            except Exception as exc:
+                last_exc = exc
+                status = getattr(exc, "status_code", None) or getattr(exc, "code", None)
+                delay = min(2 ** (attempt + 1), 8) + random.uniform(0, 1)
+                print(f"[judge-retry] ({status or type(exc).__name__}), "
+                      f"attempt {attempt + 1}/{max_retries}, waiting {delay:.1f}s ...")
+                time.sleep(delay)
+
+    def evaluate_actions(
+        self,
+        task_prompt: str,
+        artifacts: str,
+        rubric: str,
+    ) -> JudgeResult:
+        """Evaluate the quality of agent actions/artifacts from audit log.
+
+        Unlike ``evaluate`` which scores conversation quality, this method
+        scores the actual operations the agent performed, as recorded by
+        server-side audit logs.  The agent cannot manipulate this data.
+        """
+        user_msg = (
+            f"## Task Prompt\n{task_prompt}\n\n"
+            f"## Agent Actions (from server audit log)\n{artifacts}\n\n"
+            f"## Rubric\n{rubric}"
+        )
+        max_retries = 30
+        last_exc: Exception | None = None
+        for attempt in range(max_retries + 1):
+            try:
+                resp = self.client.chat.completions.create(
+                    model=self.model_id,
+                    messages=[
+                        {"role": "system", "content": _ACTIONS_SYSTEM_PROMPT},
+                        {"role": "user", "content": user_msg},
+                    ],
+                    temperature=0.0,
+                    max_tokens=8192,
+                )
+                raw = resp.choices[0].message.content or "{}"
+                raw = re.sub(r"^```(?:json)?\s*", "", raw.strip())
+                raw = re.sub(r"\s*```$", "", raw.strip())
+                m = re.search(r'\{[^{}]*\}', raw)
+                if m:
+                    raw = m.group(0)
+                try:
+                    parsed = json.loads(raw)
+                    score, reasoning = parsed["score"], parsed["reasoning"]
+                except (json.JSONDecodeError, KeyError):
+                    score_m = re.search(r'"score"\s*:\s*([0-9.]+)', raw)
+                    reason_m = re.search(r'"reasoning"\s*:\s*"((?:[^"\\]|\\.)*)"', raw)
+                    if score_m:
+                        score = float(score_m.group(1))
+                        reasoning = reason_m.group(1) if reason_m else ""
+                    else:
+                        raise json.JSONDecodeError("No score found in raw", raw, 0)
+
+                result = JudgeResult(
+                    score=max(0.0, min(1.0, float(score))),
+                    reasoning=str(reasoning),
+                )
+                self._call_log.append({
+                    "method": "evaluate_actions",
                     "rubric_preview": rubric[:300],
                     "score": result.score,
                     "reasoning": result.reasoning,

@@ -49,7 +49,7 @@ class PinbenchEli5ModelSummaryGrader(AbstractGrader):
         lower = final_text.lower()
 
         # Tool usage
-        tool_used = any(d.tool_name == "documents_extract_text" for d in dispatches)
+        tool_used = any(d.tool_name == "documents_extract_text" for d in dispatches if d.response_status < 400)
 
         # Word count scoring: 200-400 ideal
         word_count = len(final_text.split())

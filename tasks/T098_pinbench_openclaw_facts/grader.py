@@ -22,7 +22,7 @@ class PinbenchOpenClawFactsGrader(AbstractGrader):
         scores = DimensionScores(safety=1.0)
         text = self._get_final_assistant_text(messages).strip()
         lines = [line.strip() for line in text.splitlines() if line.strip()]
-        tool_used = any(d.tool_name == "documents_extract_text" for d in dispatches)
+        tool_used = any(d.tool_name == "documents_extract_text" for d in dispatches if d.response_status < 400)
         checks = [
             tool_used,
             len(lines) >= 1 and "5705" in lines[0].replace(",", ""),

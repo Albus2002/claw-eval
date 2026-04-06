@@ -109,7 +109,7 @@ Output the final weighted score: score = 0.50×Part1 + 0.50×Part2"""
             pass
 
         # 2) OCR tool usage (0.15) — rule-based
-        ocr_calls = [d for d in dispatches if d.tool_name == "ocr_extract_text"]
+        ocr_calls = [d for d in dispatches if d.tool_name == "ocr_extract_text" and d.response_status < 400]
         if ocr_calls:
             completion += 0.15
 

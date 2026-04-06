@@ -87,9 +87,9 @@ class MeetingPreparationGrader(AbstractGrader):
 
         # --- Tool usage gate ---
         cal_calls = [d for d in dispatches
-                     if d.tool_name in ("calendar_list_events", "calendar_get_event")]
+                     if d.tool_name in ("calendar_list_events", "calendar_get_event") and d.response_status < 400]
         contact_calls = [d for d in dispatches
-                         if d.tool_name in ("contacts_search", "contacts_get")]
+                         if d.tool_name in ("contacts_search", "contacts_get") and d.response_status < 400]
 
         tool_penalty = 1.0
         if len(cal_calls) < 1:

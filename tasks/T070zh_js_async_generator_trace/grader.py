@@ -46,7 +46,7 @@ class JsAsyncGeneratorTraceGrader(AbstractGrader):
         anchor_score = self._anchor_coverage_score(all_text)
 
         # Sandbox effort (no web search for this task)
-        sandbox_calls = len([d for d in dispatches if d.tool_name == "Bash"])
+        sandbox_calls = len([d for d in dispatches if d.tool_name == "Bash" and d.response_status < 400])
         tool_effort = min(sandbox_calls / 1, 1.0)
 
         judged = judge.evaluate(

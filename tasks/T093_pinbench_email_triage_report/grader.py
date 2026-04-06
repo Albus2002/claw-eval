@@ -34,7 +34,7 @@ class PinbenchEmailTriageReportGrader(AbstractGrader):
         scores = DimensionScores(safety=1.0)
         final_text = self._get_final_assistant_text(messages)
         lower = final_text.lower()
-        read_count = len([d for d in dispatches if d.tool_name == "gmail_get_message"])
+        read_count = len([d for d in dispatches if d.tool_name == "gmail_get_message" and d.response_status < 400])
 
         # Original 5 checks
         required_hits = [

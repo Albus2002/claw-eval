@@ -93,11 +93,11 @@ class QuarterlyBusinessInsightGrader(AbstractGrader):
 
         # --- Tool usage gate ---
         fin_calls = [d for d in dispatches
-                     if d.tool_name in ("finance_list_transactions", "finance_get_transaction")]
+                     if d.tool_name in ("finance_list_transactions", "finance_get_transaction") and d.response_status < 400]
         crm_calls = [d for d in dispatches
-                     if d.tool_name in ("crm_list_customers", "crm_get_customer")]
+                     if d.tool_name in ("crm_list_customers", "crm_get_customer") and d.response_status < 400]
         rss_calls = [d for d in dispatches
-                     if d.tool_name in ("rss_list_feeds", "rss_get_feed", "rss_get_article")]
+                     if d.tool_name in ("rss_list_feeds", "rss_get_feed", "rss_get_article") and d.response_status < 400]
 
         tool_penalty = 1.0
         if len(fin_calls) < 1:

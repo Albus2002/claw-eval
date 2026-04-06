@@ -123,12 +123,12 @@ TK-1009是CRM培训满意度调查问卷，不是系统故障：
         actions_summary = self.summarize_actions(audit_data)
 
         # 1) Listing tickets (0.10) — rule-based
-        list_calls = [d for d in dispatches if d.tool_name == "helpdesk_list_tickets"]
+        list_calls = [d for d in dispatches if d.tool_name == "helpdesk_list_tickets" and d.response_status < 400]
         if list_calls:
             completion += 0.10
 
         # 2) Reading tickets (0.10) — rule-based
-        get_calls = [d for d in dispatches if d.tool_name == "helpdesk_get_ticket"]
+        get_calls = [d for d in dispatches if d.tool_name == "helpdesk_get_ticket" and d.response_status < 400]
         tickets_read = {d.request_body.get("ticket_id") for d in get_calls}
         read_count = len(tickets_read & self.ALL_TICKETS)
         if read_count >= 6:
@@ -146,7 +146,7 @@ TK-1009是CRM培训满意度调查问卷，不是系统故障：
         )
 
         # 4) Updating tickets (0.40) — rule-based
-        update_calls = [d for d in dispatches if d.tool_name == "helpdesk_update_ticket"]
+        update_calls = [d for d in dispatches if d.tool_name == "helpdesk_update_ticket" and d.response_status < 400]
         updated_tickets = {d.request_body.get("ticket_id") for d in update_calls}
         updated_count = len(updated_tickets)
 

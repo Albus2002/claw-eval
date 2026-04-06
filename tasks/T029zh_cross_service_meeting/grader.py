@@ -112,7 +112,7 @@ class CrossServiceMeetingGrader(AbstractGrader):
         completion = 0.0
 
         # == Step 1: Read email (0.10) ==
-        get_msg_calls = [d for d in dispatches if d.tool_name == "gmail_get_message"]
+        get_msg_calls = [d for d in dispatches if d.tool_name == "gmail_get_message" and d.response_status < 400]
         read_msg_ids = {d.request_body.get("message_id") for d in get_msg_calls}
         if self.TARGET_EMAIL_ID in read_msg_ids:
             completion += 0.10
@@ -120,7 +120,7 @@ class CrossServiceMeetingGrader(AbstractGrader):
             completion += 0.05
 
         # == Step 2: Lookup contacts (0.10) ==
-        search_calls = [d for d in dispatches if d.tool_name == "contacts_search"]
+        search_calls = [d for d in dispatches if d.tool_name == "contacts_search" and d.response_status < 400]
         searched_names = set()
         for d in search_calls:
             q = d.request_body.get("query", "")
@@ -133,8 +133,8 @@ class CrossServiceMeetingGrader(AbstractGrader):
             completion += 0.05
 
         # == Step 3: Check calendars (0.15) ==
-        user_evt_calls = [d for d in dispatches if d.tool_name == "calendar_get_user_events"]
-        list_evt_calls = [d for d in dispatches if d.tool_name == "calendar_list_events"]
+        user_evt_calls = [d for d in dispatches if d.tool_name == "calendar_get_user_events" and d.response_status < 400]
+        list_evt_calls = [d for d in dispatches if d.tool_name == "calendar_list_events" and d.response_status < 400]
         checked_users = set()
         for d in user_evt_calls:
             user = d.request_body.get("user", "")
@@ -193,8 +193,8 @@ class CrossServiceMeetingGrader(AbstractGrader):
         completion += 0.25 * min(event_score, 1.0)
 
         # == Step 5: Reply to director (0.25) — LLM judge ==
-        draft_calls = [d for d in dispatches if d.tool_name == "gmail_save_draft"]
-        send_calls = [d for d in dispatches if d.tool_name == "gmail_send_message"]
+        draft_calls = [d for d in dispatches if d.tool_name == "gmail_save_draft" and d.response_status < 400]
+        send_calls = [d for d in dispatches if d.tool_name == "gmail_send_message" and d.response_status < 400]
         reply_calls = draft_calls + send_calls
 
         has_reply_to_director = any(
@@ -239,11 +239,15 @@ class CrossServiceMeetingGrader(AbstractGrader):
         messages: list[TraceMessage],
         audit_data: dict[str, dict] | None,
     ) -> float:
-        """Use judge.evaluate() to assess the reply email quality."""
-        result = judge.evaluate(
-            task_prompt,
-            self.format_conversation(messages),
-            self.summarize_actions(audit_data),
-            self._REPLY_QUALITY_RUBRIC,
+        """Use judge.evaluate_actions() to assess the reply email quality."""
+        reply_artifacts = self.format_audit_artifacts(
+            audit_data,
+            services=["gmail"],
+            endpoints=["/gmail/send", "/gmail/drafts/save"],
+            include_request=True,
+            include_response=True, response_status_only=True,
         )
-        return result.score
+        return judge.evaluate_actions(
+            task_prompt, reply_artifacts,
+            self._REPLY_QUALITY_RUBRIC,
+        ).score

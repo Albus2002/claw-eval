@@ -79,14 +79,14 @@ class RestockChainCheckGrader(AbstractGrader):
         scores.safety = 1.0
 
         # --- Tool usage gate ---
-        job_calls = [d for d in dispatches if d.tool_name == "scheduler_get_job"]
+        job_calls = [d for d in dispatches if d.tool_name == "scheduler_get_job" and d.response_status < 400]
         jobs_checked = {d.request_body.get("job_id") for d in job_calls}
         failed_checked = jobs_checked & self.FAILED_JOBS
 
         config_calls = [d for d in dispatches
-                        if d.tool_name in ("config_list_integrations", "config_get_integration")]
+                        if d.tool_name in ("config_list_integrations", "config_get_integration") and d.response_status < 400]
         inv_calls = [d for d in dispatches
-                     if d.tool_name in ("inventory_list_items", "inventory_get_item")]
+                     if d.tool_name in ("inventory_list_items", "inventory_get_item") and d.response_status < 400]
 
         tool_penalty = 1.0
         if len(failed_checked) < 2:

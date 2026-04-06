@@ -107,11 +107,11 @@ agent应从多篇文章中综合VPN问题排查的关键信息：
         conversation = self.format_conversation(messages)
         actions_summary = self.summarize_actions(audit_data)
 
-        get_calls = [d for d in dispatches if d.tool_name == "kb_get_article"]
+        get_calls = [d for d in dispatches if d.tool_name == "kb_get_article" and d.response_status < 400]
         articles_read = {d.request_body.get("article_id") for d in get_calls}
 
         # 1) Search breadth (0.10) — rule-based
-        search_calls = [d for d in dispatches if d.tool_name == "kb_search"]
+        search_calls = [d for d in dispatches if d.tool_name == "kb_search" and d.response_status < 400]
         if len(search_calls) >= 2:
             completion += 0.10
         elif len(search_calls) >= 1:

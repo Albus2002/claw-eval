@@ -9,6 +9,7 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any
 
+from ..models.content import ImageBlock, TextBlock, ToolResultBlock, ToolUseBlock
 from ..models.task import TaskDefinition
 from ..models.trace import DimensionScores, MediaLoad, ToolDispatch, TraceMessage
 
@@ -207,6 +208,87 @@ class AbstractGrader(ABC):
         return "\n".join(lines)
 
     @staticmethod
+    def format_conversation_detailed(
+        messages: list[TraceMessage],
+        *,
+        include_user_text: bool = True,
+        include_assistant_text: bool = True,
+        include_reasoning: bool = False,
+        include_tool_use: bool = False,
+        include_tool_result: bool = False,
+        include_image: bool = False,
+    ) -> str:
+        """Format messages into a detailed conversation transcript.
+
+        Unlike ``format_conversation`` (which only keeps TextBlock content),
+        this method allows fine-grained control over which content blocks are
+        included.  Default flags ``(True, True, False, False, False, False)``
+        reproduce the same output as ``format_conversation``.
+
+        Parameters
+        ----------
+        include_user_text : bool
+            Include user-role TextBlock (user prompts and user-agent replies).
+        include_assistant_text : bool
+            Include assistant-role TextBlock (agent's spoken output).
+        include_reasoning : bool
+            Include assistant ``reasoning_content`` (chain-of-thought).
+        include_tool_use : bool
+            Include assistant ToolUseBlock (tool name + parameters).
+        include_tool_result : bool
+            Include ToolResultBlock in user messages (tool responses).
+        include_image : bool
+            Include a placeholder for ImageBlock in user messages.
+        """
+        import json as _json
+
+        lines: list[str] = []
+
+        for m in messages:
+            role = m.message.role  # "user" or "assistant"
+
+            # --- Reasoning (assistant only, before content blocks) ---
+            if (
+                include_reasoning
+                and role == "assistant"
+                and m.message.reasoning_content
+            ):
+                lines.append(f"[ASSISTANT THINKING]: {m.message.reasoning_content}")
+
+            # --- Content blocks ---
+            for block in m.message.content:
+                if isinstance(block, TextBlock):
+                    if not block.text.strip():
+                        continue
+                    if role == "user" and include_user_text:
+                        lines.append(f"[USER]: {block.text}")
+                    elif role == "assistant" and include_assistant_text:
+                        lines.append(f"[ASSISTANT]: {block.text}")
+
+                elif isinstance(block, ToolUseBlock):
+                    if include_tool_use and role == "assistant":
+                        params = _json.dumps(block.input, ensure_ascii=False)
+                        lines.append(f"[TOOL CALL]: {block.name}({params})")
+
+                elif isinstance(block, ToolResultBlock):
+                    if include_tool_result:
+                        text_parts = [
+                            tb.text
+                            for tb in block.content
+                            if isinstance(tb, TextBlock)
+                        ]
+                        result_text = "\n".join(text_parts)
+                        tag = "TOOL RESULT ERROR" if block.is_error else "TOOL RESULT"
+                        lines.append(f"[{tag}]: {result_text}")
+
+                elif isinstance(block, ImageBlock):
+                    if include_image:
+                        source = block.source_path or "inline image"
+                        lines.append(f"[IMAGE]: {source} ({block.mime_type})")
+
+        return "\n".join(lines)
+
+    @staticmethod
     def summarize_actions(audit_data: dict[str, dict] | None) -> str:
         """Produce a human-readable summary of actions taken, for judge input."""
         if not audit_data:
@@ -218,3 +300,81 @@ class AbstractGrader(ABC):
                 endpoints = [c.get("endpoint", "?") for c in calls]
                 parts.append(f"{svc_name}: {len(calls)} calls — {', '.join(endpoints)}")
         return "\n".join(parts) if parts else "No actions recorded."
+
+    @staticmethod
+    def format_audit_artifacts(
+        audit_data: dict[str, dict] | None,
+        *,
+        services: list[str] | None = None,
+        endpoints: list[str] | None = None,
+        include_request: bool = True,
+        include_response: bool = False,
+        response_status_only: bool = False,
+    ) -> str:
+        """Extract structured artifacts from audit log for judge input.
+
+        Unlike ``summarize_actions`` (which only lists endpoint names),
+        this method returns the actual content of requests and/or responses
+        recorded by mock services.  The audit log is server-side and cannot
+        be manipulated by the agent.
+
+        Parameters
+        ----------
+        audit_data : dict
+            Audit data keyed by service name, as returned by ``load_trace``.
+        services : list[str] | None
+            Only include calls from these services.  ``None`` = all.
+        endpoints : list[str] | None
+            Only include calls to these endpoints.  ``None`` = all.
+        include_request : bool
+            Include the request body of each call.
+        include_response : bool
+            Include the response body of each call.
+        response_status_only : bool
+            When True (and ``include_response`` is True), only output the
+            top-level ``status`` and/or ``error`` fields from the response,
+            omitting nested objects that duplicate the request content.
+        """
+        import json as _json
+
+        if not audit_data:
+            return "No audit data available."
+
+        sections: list[str] = []
+
+        for svc_name, svc_data in audit_data.items():
+            if services is not None and svc_name not in services:
+                continue
+            calls = svc_data.get("calls", [])
+            for call in calls:
+                ep = call.get("endpoint", "")
+                if endpoints is not None and ep not in endpoints:
+                    continue
+
+                parts: list[str] = [f"[{svc_name}] {ep}"]
+
+                if include_request:
+                    req = call.get("request_body", {})
+                    parts.append(
+                        f"  Request: {_json.dumps(req, ensure_ascii=False)}"
+                    )
+
+                if include_response:
+                    resp = call.get("response_body", {})
+                    if response_status_only and isinstance(resp, dict):
+                        status_info = {}
+                        if "status" in resp:
+                            status_info["status"] = resp["status"]
+                        if "error" in resp:
+                            status_info["error"] = resp["error"]
+                        parts.append(
+                            f"  Response: {_json.dumps(status_info, ensure_ascii=False)}"
+                        )
+                    else:
+                        parts.append(
+                            f"  Response: {_json.dumps(resp, ensure_ascii=False)}"
+                        )
+
+                sections.append("\n".join(parts))
+
+        return "\n\n".join(sections) if sections else "No matching artifacts."

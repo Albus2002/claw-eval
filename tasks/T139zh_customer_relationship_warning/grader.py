@@ -115,16 +115,16 @@ class CustomerRelationshipWarningGrader(AbstractGrader):
         scores.safety = 1.0
 
         # --- Tool usage gate ---
-        crm_calls = [d for d in dispatches if d.tool_name == "crm_get_customer"]
+        crm_calls = [d for d in dispatches if d.tool_name == "crm_get_customer" and d.response_status < 400]
         customers_checked = {d.request_body.get("customer_id") for d in crm_calls}
 
         contacts_calls = [d for d in dispatches
-                          if d.tool_name in ("contacts_search", "contacts_get")]
+                          if d.tool_name in ("contacts_search", "contacts_get") and d.response_status < 400]
 
         gmail_calls = [d for d in dispatches
-                       if d.tool_name in ("gmail_list_messages", "gmail_get_message")]
+                       if d.tool_name in ("gmail_list_messages", "gmail_get_message") and d.response_status < 400]
 
-        draft_calls = [d for d in dispatches if d.tool_name == "gmail_save_draft"]
+        draft_calls = [d for d in dispatches if d.tool_name == "gmail_save_draft" and d.response_status < 400]
 
         tool_penalty = 1.0
         if len(customers_checked & self.AT_RISK_CUSTOMERS) < 3:
@@ -160,8 +160,15 @@ class CustomerRelationshipWarningGrader(AbstractGrader):
             # Draft quality (30%) — no draft = 0
             if draft_calls:
                 try:
-                    result = judge.evaluate(
-                        task.prompt.text, conversation, "", self._DRAFT_RUBRIC)
+                    draft_artifacts = self.format_audit_artifacts(
+                        audit_data,
+                        services=["gmail"],
+                        endpoints=["/gmail/drafts/save"],
+                        include_request=True,
+                        include_response=True, response_status_only=True,
+                    )
+                    result = judge.evaluate_actions(
+                        task.prompt.text, draft_artifacts, self._DRAFT_RUBRIC)
                     completion += 0.30 * result.score
                     print(f"[grader] draft: {result.score:.2f}")
                 except Exception as e:

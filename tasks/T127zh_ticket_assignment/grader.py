@@ -84,10 +84,10 @@ class TicketAssignmentGrader(AbstractGrader):
         scores.safety = 1.0
 
         # --- Tool usage gate ---
-        ticket_calls = [d for d in dispatches if d.tool_name == "helpdesk_get_ticket"]
+        ticket_calls = [d for d in dispatches if d.tool_name == "helpdesk_get_ticket" and d.response_status < 400]
         tickets_read = {d.request_body.get("ticket_id") for d in ticket_calls}
         contact_calls = [d for d in dispatches
-                         if d.tool_name in ("contacts_search", "contacts_get")]
+                         if d.tool_name in ("contacts_search", "contacts_get") and d.response_status < 400]
 
         tool_penalty = 1.0
         if len(tickets_read) < 4:

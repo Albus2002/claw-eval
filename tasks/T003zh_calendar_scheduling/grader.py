@@ -135,12 +135,12 @@ class CalendarSchedulingGrader(AbstractGrader):
         actions_summary = self.summarize_actions(audit_data)
 
         # 1) Checking own calendar (0.15) — rule-based
-        list_calls = [d for d in dispatches if d.tool_name == "calendar_list_events"]
+        list_calls = [d for d in dispatches if d.tool_name == "calendar_list_events" and d.response_status < 400]
         if list_calls:
             completion += 0.15
 
         # 2) Checking attendees' calendars (0.20) — rule-based
-        user_event_calls = [d for d in dispatches if d.tool_name == "calendar_get_user_events"]
+        user_event_calls = [d for d in dispatches if d.tool_name == "calendar_get_user_events" and d.response_status < 400]
         checked_users = set()
         for d in user_event_calls:
             user = d.request_body.get("user", "")
@@ -153,7 +153,7 @@ class CalendarSchedulingGrader(AbstractGrader):
         completion += 0.20 * (len(checked_users) / len(self.ATTENDEE_NAMES))
 
         # 3) Creating event in valid slot (0.30) — rule-based
-        create_calls = [d for d in dispatches if d.tool_name == "calendar_create_event"]
+        create_calls = [d for d in dispatches if d.tool_name == "calendar_create_event" and d.response_status < 400]
         created_valid = False
         created_at_all = False
         for d in create_calls:

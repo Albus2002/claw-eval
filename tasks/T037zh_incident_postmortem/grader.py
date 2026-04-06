@@ -247,7 +247,7 @@ class IncidentPostmortemGrader(AbstractGrader):
     @staticmethod
     def _score_tool_coverage(dispatches: list[ToolDispatch]) -> float:
         """Score breadth and depth across 6 services."""
-        called = {d.tool_name for d in dispatches}
+        called = {d.tool_name for d in dispatches if d.response_status < 400}
 
         service_checks = [
             bool(called & {"helpdesk_list_tickets", "helpdesk_get_ticket"}),
@@ -264,7 +264,7 @@ class IncidentPostmortemGrader(AbstractGrader):
             "gmail_get_message", "kb_get_article", "notes_get",
             "scheduler_get_job", "scheduler_job_history",
         }
-        detail_count = len([d for d in dispatches if d.tool_name in detail_tools])
+        detail_count = len([d for d in dispatches if d.tool_name in detail_tools and d.response_status < 400])
         depth = min(detail_count / 10, 1.0)
 
         return round(breadth * 0.6 + depth * 0.4, 4)
@@ -290,7 +290,7 @@ class IncidentPostmortemGrader(AbstractGrader):
         score += 0.20 * (all_found / len(self.ALL_TICKET_IDS))
 
         # Fetched critical tickets (0.30)
-        get_calls = [d for d in dispatches if d.tool_name == "helpdesk_get_ticket"]
+        get_calls = [d for d in dispatches if d.tool_name == "helpdesk_get_ticket" and d.response_status < 400]
         fetched = {d.request_body.get("ticket_id") for d in get_calls}
         critical = fetched & {"TK-1903", "TK-1908", "TK-1909"}
         if len(critical) >= 3:

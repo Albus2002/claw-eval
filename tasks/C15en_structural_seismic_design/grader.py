@@ -248,7 +248,9 @@ The original question is about seismic facade design under GB 50011. If the resp
         if judge is None:
             return scores
 
-        full_conversation = self.format_conversation(messages)
+        full_conversation = self.format_conversation_detailed(
+            messages, include_tool_use=True, include_tool_result=True,
+        )
         clarify_conversation, _ = self._split_phases(messages)
         prompt_text = task.prompt.text
 

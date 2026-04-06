@@ -152,7 +152,7 @@ class ExpenseReportGrader(AbstractGrader):
         actions_summary = self.summarize_actions(audit_data)
 
         # 1) Listing transactions (0.05) — rule-based
-        list_calls = [d for d in dispatches if d.tool_name == "finance_list_transactions"]
+        list_calls = [d for d in dispatches if d.tool_name == "finance_list_transactions" and d.response_status < 400]
         if list_calls:
             completion += 0.05
 
@@ -181,8 +181,9 @@ class ExpenseReportGrader(AbstractGrader):
                 continue
 
         # 5) Submission correctness (0.25) — rule-based
-        if submit_calls:
-            last_submit = submit_calls[-1]
+        successful_submit_calls = [d for d in dispatches if d.tool_name == "finance_submit_report" and d.response_status < 400]
+        if successful_submit_calls:
+            last_submit = successful_submit_calls[-1]
             sub_txns = set(last_submit.request_body.get("transactions", []))
             sub_total = last_submit.request_body.get("total_amount")
             has_both_dupes = (

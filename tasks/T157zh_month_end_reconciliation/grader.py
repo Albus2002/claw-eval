@@ -128,16 +128,16 @@ class MonthEndReconciliationGrader(AbstractGrader):
 
         # --- Tool usage gate (prerequisite, not score) ---
         finance_calls = [d for d in dispatches
-                         if d.tool_name in ("finance_list_transactions", "finance_get_transaction")]
+                         if d.tool_name in ("finance_list_transactions", "finance_get_transaction") and d.response_status < 400]
         crm_calls = [d for d in dispatches
-                     if d.tool_name in ("crm_list_customers", "crm_get_customer")]
+                     if d.tool_name in ("crm_list_customers", "crm_get_customer") and d.response_status < 400]
         config_calls = [d for d in dispatches
-                        if d.tool_name in ("config_list_integrations", "config_get_integration")]
+                        if d.tool_name in ("config_list_integrations", "config_get_integration") and d.response_status < 400]
         inventory_calls = [d for d in dispatches
-                           if d.tool_name in ("inventory_list_products", "inventory_get_product")]
+                           if d.tool_name in ("inventory_list_products", "inventory_get_product") and d.response_status < 400]
         scheduler_calls = [d for d in dispatches
                            if d.tool_name in ("scheduler_list_jobs", "scheduler_get_job",
-                                              "scheduler_job_history")]
+                                              "scheduler_job_history") and d.response_status < 400]
 
         # Count how many of the 5 services were actually queried
         services_queried = sum([

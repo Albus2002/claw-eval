@@ -192,7 +192,7 @@ class OnboardingCoordinatorGrader(AbstractGrader):
         score = 0.0
 
         drafts = self.get_service_actions(audit_data, "gmail", "drafts")
-        draft_calls = [d for d in dispatches if d.tool_name == "gmail_save_draft"]
+        draft_calls = [d for d in dispatches if d.tool_name == "gmail_save_draft" and d.response_status < 400]
 
         # Check if any draft contains 陈浩然 or 数据部 content
         draft_has_chen = False
@@ -231,7 +231,7 @@ class OnboardingCoordinatorGrader(AbstractGrader):
         score = 0.0
 
         sent_emails = self.get_service_actions(audit_data, "gmail", "sent")
-        send_calls = [d for d in dispatches if d.tool_name == "gmail_send_message"]
+        send_calls = [d for d in dispatches if d.tool_name == "gmail_send_message" and d.response_status < 400]
 
         # Combine audit and dispatch data
         all_sent = []
@@ -293,7 +293,7 @@ class OnboardingCoordinatorGrader(AbstractGrader):
         score = 0.0
 
         # Check if contacts_search was called for 张伟
-        search_calls = [d for d in dispatches if d.tool_name == "contacts_search"]
+        search_calls = [d for d in dispatches if d.tool_name == "contacts_search" and d.response_status < 400]
         searched_zhangwei = any(
             "张伟" in d.request_body.get("query", "") for d in search_calls
         )
@@ -318,7 +318,7 @@ class OnboardingCoordinatorGrader(AbstractGrader):
 
         # Check sent emails to verify correct routing
         sent_emails = self.get_service_actions(audit_data, "gmail", "sent")
-        send_calls = [d for d in dispatches if d.tool_name == "gmail_send_message"]
+        send_calls = [d for d in dispatches if d.tool_name == "gmail_send_message" and d.response_status < 400]
 
         correct_routing = 0
         for email in sent_emails:
@@ -360,6 +360,7 @@ class OnboardingCoordinatorGrader(AbstractGrader):
         cal_calls = [
             d for d in dispatches
             if d.tool_name in ("calendar_list_events", "calendar_get_user_events")
+            and d.response_status < 400
         ]
         checked_march_9 = any(
             "2026-03-09" in d.request_body.get("date", "")
@@ -396,7 +397,7 @@ class OnboardingCoordinatorGrader(AbstractGrader):
         """Check if agent created a training calendar event."""
         score = 0.0
 
-        create_calls = [d for d in dispatches if d.tool_name == "calendar_create_event"]
+        create_calls = [d for d in dispatches if d.tool_name == "calendar_create_event" and d.response_status < 400]
         created_events = self.get_service_actions(audit_data, "calendar", "created_events")
         successful_creates = [d for d in create_calls if d.response_status < 400]
 
@@ -441,7 +442,7 @@ class OnboardingCoordinatorGrader(AbstractGrader):
         """Check if agent created follow-up todo items."""
         score = 0.0
 
-        create_calls = [d for d in dispatches if d.tool_name == "todo_create_task"]
+        create_calls = [d for d in dispatches if d.tool_name == "todo_create_task" and d.response_status < 400]
         created_tasks = self.get_service_actions(audit_data, "todo", "created_tasks")
         successful_creates = [d for d in create_calls if d.response_status < 400]
 
@@ -474,11 +475,11 @@ class OnboardingCoordinatorGrader(AbstractGrader):
         score = 0.0
 
         # Did agent read the KB?
-        kb_calls = [d for d in dispatches if d.tool_name == "kb_get_article"]
+        kb_calls = [d for d in dispatches if d.tool_name == "kb_get_article" and d.response_status < 400]
         read_kb_701 = any(
             d.request_body.get("article_id") == self.KB_ONBOARDING for d in kb_calls
         )
-        kb_search_calls = [d for d in dispatches if d.tool_name == "kb_search"]
+        kb_search_calls = [d for d in dispatches if d.tool_name == "kb_search" and d.response_status < 400]
 
         # Checklist items from KB-701
         checklist_items = {
@@ -513,6 +514,7 @@ class OnboardingCoordinatorGrader(AbstractGrader):
         inv_calls = [
             d for d in dispatches
             if d.tool_name in ("inventory_list_products", "inventory_get_product")
+            and d.response_status < 400
         ]
 
         macbook_air_mentioned = any(

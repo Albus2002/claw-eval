@@ -100,9 +100,9 @@ class TodoCalendarConflictGrader(AbstractGrader):
 
         # --- Tool usage gate ---
         todo_calls = [d for d in dispatches
-                      if d.tool_name in ("todo_list_tasks", "todo_get_task")]
+                      if d.tool_name in ("todo_list_tasks", "todo_get_task") and d.response_status < 400]
         cal_calls = [d for d in dispatches
-                     if d.tool_name in ("calendar_list_events", "calendar_get_event")]
+                     if d.tool_name in ("calendar_list_events", "calendar_get_event") and d.response_status < 400]
 
         tool_penalty = 1.0
         if len(todo_calls) < 1:

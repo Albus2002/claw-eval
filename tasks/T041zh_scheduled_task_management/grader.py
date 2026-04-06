@@ -71,9 +71,9 @@ class ScheduledTaskManagementGrader(AbstractGrader):
         completion = 0.0
 
         # == 1. Failed job identification (0.15) ==
-        get_job_calls = [d for d in dispatches if d.tool_name == "scheduler_get_job"]
+        get_job_calls = [d for d in dispatches if d.tool_name == "scheduler_get_job" and d.response_status < 400]
         inspected_jobs = {d.request_body.get("job_id") for d in get_job_calls}
-        history_calls = [d for d in dispatches if d.tool_name == "scheduler_job_history"]
+        history_calls = [d for d in dispatches if d.tool_name == "scheduler_job_history" and d.response_status < 400]
         history_jobs = {d.request_body.get("job_id") for d in history_calls}
 
         found_failed = self.FAILED_JOBS & (inspected_jobs | history_jobs)
@@ -141,9 +141,9 @@ class ScheduledTaskManagementGrader(AbstractGrader):
         completion += 0.12 * min(ops_score, 1.0)
 
         # == 6. KB consultation (0.10) ==
-        kb_get_calls = [d for d in dispatches if d.tool_name == "kb_get_article"]
+        kb_get_calls = [d for d in dispatches if d.tool_name == "kb_get_article" and d.response_status < 400]
         kb_articles_read = {d.request_body.get("article_id") for d in kb_get_calls}
-        kb_search_calls = [d for d in dispatches if d.tool_name == "kb_search"]
+        kb_search_calls = [d for d in dispatches if d.tool_name == "kb_search" and d.response_status < 400]
 
         kb_score = 0.0
         relevant_articles = {self.KB_POLICY, self.KB_DISK, self.KB_CERT}

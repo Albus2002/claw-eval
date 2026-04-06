@@ -125,11 +125,11 @@ class MeetingNotesGrader(AbstractGrader):
         conversation = self.format_conversation(messages)
         actions_summary = self.summarize_actions(audit_data)
 
-        get_calls = [d for d in dispatches if d.tool_name == "notes_get"]
+        get_calls = [d for d in dispatches if d.tool_name == "notes_get" and d.response_status < 400]
         notes_fetched = {d.request_body.get("note_id", "") for d in get_calls}
 
         # 1) Listing notes (0.08) — rule-based
-        list_calls = [d for d in dispatches if d.tool_name == "notes_list"]
+        list_calls = [d for d in dispatches if d.tool_name == "notes_list" and d.response_status < 400]
         if list_calls:
             completion += 0.08
 

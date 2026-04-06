@@ -91,7 +91,7 @@ agent是否利用了邮件中的上下文线索进行推理：
         completion = 0.0
 
         # 1. Read the email context (0.15)
-        get_calls = [d for d in dispatches if d.tool_name == "gmail_get_message"]
+        get_calls = [d for d in dispatches if d.tool_name == "gmail_get_message" and d.response_status < 400]
         read_target = any(
             d.request_body.get("message_id") == self.TARGET_EMAIL_ID for d in get_calls
         )
@@ -99,7 +99,7 @@ agent是否利用了邮件中的上下文线索进行推理：
             completion += 0.15
 
         # 2. Searched for contacts (0.15)
-        search_calls = [d for d in dispatches if d.tool_name == "contacts_search"]
+        search_calls = [d for d in dispatches if d.tool_name == "contacts_search" and d.response_status < 400]
         if search_calls:
             completion += 0.15
 

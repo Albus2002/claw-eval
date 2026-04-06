@@ -123,7 +123,7 @@ Output the final weighted score: score = 0.40×Part1 + 0.35×Part2 + 0.25×Part3
             pass
 
         # 2) OCR tool usage (0.10) — rule-based
-        if any(d.tool_name == "ocr_extract_text" for d in dispatches):
+        if any(d.tool_name == "ocr_extract_text" for d in dispatches if d.response_status < 400):
             completion += 0.10
 
         # 3) Computation methodology (0.35) — LLM Judge

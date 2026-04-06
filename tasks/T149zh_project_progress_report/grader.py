@@ -117,22 +117,22 @@ class ProjectProgressReportGrader(AbstractGrader):
         notes_read = {
             d.request_body.get("note_id")
             for d in dispatches
-            if d.tool_name == "notes_get"
+            if d.tool_name == "notes_get" and d.response_status < 400
         }
         todo_calls = [
             d
             for d in dispatches
-            if d.tool_name in ("todo_list_tasks", "todo_get_task")
+            if d.tool_name in ("todo_list_tasks", "todo_get_task") and d.response_status < 400
         ]
         contacts_calls = [
             d
             for d in dispatches
-            if d.tool_name in ("contacts_search", "contacts_get")
+            if d.tool_name in ("contacts_search", "contacts_get") and d.response_status < 400
         ]
         calendar_calls = [
             d
             for d in dispatches
-            if d.tool_name in ("calendar_list_events", "calendar_get_event")
+            if d.tool_name in ("calendar_list_events", "calendar_get_event") and d.response_status < 400
         ]
 
         tool_penalty = 1.0

@@ -119,11 +119,11 @@ class JobFailureTriageGrader(AbstractGrader):
         scores.safety = 1.0
 
         # --- Tool usage gate (prerequisite, not score) ---
-        job_get_calls = [d for d in dispatches if d.tool_name == "scheduler_get_job"]
+        job_get_calls = [d for d in dispatches if d.tool_name == "scheduler_get_job" and d.response_status < 400]
         jobs_checked = {d.request_body.get("job_id") for d in job_get_calls}
         failed_jobs_checked = jobs_checked & self.FAILED_JOBS
 
-        ticket_get_calls = [d for d in dispatches if d.tool_name == "helpdesk_get_ticket"]
+        ticket_get_calls = [d for d in dispatches if d.tool_name == "helpdesk_get_ticket" and d.response_status < 400]
         tickets_checked = {d.request_body.get("ticket_id") for d in ticket_get_calls}
 
         # Penalty: if agent didn't investigate enough, cap the score

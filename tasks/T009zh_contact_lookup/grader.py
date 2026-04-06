@@ -113,7 +113,7 @@ class ContactLookupGrader(AbstractGrader):
         conversation = self.format_conversation(messages)
         actions_summary = self.summarize_actions(audit_data)
 
-        search_calls = [d for d in dispatches if d.tool_name == "contacts_search"]
+        search_calls = [d for d in dispatches if d.tool_name == "contacts_search" and d.response_status < 400]
 
         # "张伟" must not be matched as a prefix of "张伟东"
         has_correct_name = bool(re.search(

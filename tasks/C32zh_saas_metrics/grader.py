@@ -202,7 +202,9 @@ class CbA241Grader(UserAgentClarifyGraderBase):
         if judge is None:
             return scores
 
-        full_conversation = self.format_conversation(messages)
+        full_conversation = self.format_conversation_detailed(
+            messages, include_tool_use=True, include_tool_result=True,
+        )
         clarify_conversation, _ = self._split_phases(messages)
         prompt_text = task.prompt.text
 

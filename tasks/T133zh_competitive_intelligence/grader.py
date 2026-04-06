@@ -99,11 +99,11 @@ class CompetitiveIntelligenceGrader(AbstractGrader):
 
         # --- Tool usage gate ---
         rss_calls = [d for d in dispatches
-                     if d.tool_name in ("rss_list_articles", "rss_get_article")]
+                     if d.tool_name in ("rss_list_articles", "rss_get_article") and d.response_status < 400]
         kb_calls = [d for d in dispatches
-                    if d.tool_name in ("kb_search", "kb_get_article")]
+                    if d.tool_name in ("kb_search", "kb_get_article") and d.response_status < 400]
         gmail_calls = [d for d in dispatches
-                       if d.tool_name in ("gmail_list_messages", "gmail_get_message")]
+                       if d.tool_name in ("gmail_list_messages", "gmail_get_message") and d.response_status < 400]
 
         tool_penalty = 1.0
         if len(rss_calls) < 2:
@@ -135,8 +135,15 @@ class CompetitiveIntelligenceGrader(AbstractGrader):
                 print(f"[grader] depth judge failed: {e}")
 
             try:
+                draft_artifacts = self.format_audit_artifacts(
+                    audit_data,
+                    services=["gmail"],
+                    endpoints=["/gmail/drafts/save"],
+                    include_request=True,
+                    include_response=True, response_status_only=True,
+                )
                 result = judge.evaluate(
-                    task.prompt.text, conversation, "", self._DELIVERABLE_RUBRIC)
+                    task.prompt.text, conversation, draft_artifacts, self._DELIVERABLE_RUBRIC)
                 completion += 0.30 * result.score
                 print(f"[grader] deliverable: {result.score:.2f}")
             except Exception as e:

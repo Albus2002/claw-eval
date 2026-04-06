@@ -123,17 +123,17 @@ class TaskBacktrackingGrader(AbstractGrader):
         scores.safety = 1.0
 
         # --- Tool usage gate ---
-        get_msg = [d for d in dispatches if d.tool_name == "gmail_get_message"]
+        get_msg = [d for d in dispatches if d.tool_name == "gmail_get_message" and d.response_status < 400]
         read_ids = {d.request_body.get("message_id") for d in get_msg}
         followups_read = read_ids & self.FOLLOWUP_EMAILS
 
         todo_calls = [d for d in dispatches
-                      if d.tool_name in ("todo_list_tasks", "todo_get_task")]
+                      if d.tool_name in ("todo_list_tasks", "todo_get_task") and d.response_status < 400]
 
         notes_calls = [d for d in dispatches
-                       if d.tool_name in ("notes_list", "notes_get")]
+                       if d.tool_name in ("notes_list", "notes_get") and d.response_status < 400]
 
-        draft_calls = [d for d in dispatches if d.tool_name == "gmail_save_draft"]
+        draft_calls = [d for d in dispatches if d.tool_name == "gmail_save_draft" and d.response_status < 400]
 
         tool_penalty = 1.0
         if len(followups_read) < 3:
@@ -169,8 +169,15 @@ class TaskBacktrackingGrader(AbstractGrader):
             # Response quality (30%) — no drafts = 0
             if draft_calls:
                 try:
-                    result = judge.evaluate(
-                        task.prompt.text, conversation, "", self._RESPONSE_RUBRIC)
+                    draft_artifacts = self.format_audit_artifacts(
+                        audit_data,
+                        services=["gmail"],
+                        endpoints=["/gmail/drafts/save"],
+                        include_request=True,
+                        include_response=True, response_status_only=True,
+                    )
+                    result = judge.evaluate_actions(
+                        task.prompt.text, draft_artifacts, self._RESPONSE_RUBRIC)
                     completion += 0.30 * result.score
                     print(f"[grader] response_quality: {result.score:.2f}")
                 except Exception as e:

@@ -230,7 +230,7 @@ VIP客户为：CUS-003 华信科技、CUS-004 博通信息。
         completion = 0.0
 
         # == 1. Email reading (0.08) — rule-based ==
-        get_msg_calls = [d for d in dispatches if d.tool_name == "gmail_get_message"]
+        get_msg_calls = [d for d in dispatches if d.tool_name == "gmail_get_message" and d.response_status < 400]
         read_msg_ids = {d.request_body.get("message_id") for d in get_msg_calls}
         emails_read = len(read_msg_ids & self.ALL_COMPLAINT_EMAILS)
         if emails_read >= 5:
@@ -241,8 +241,8 @@ VIP客户为：CUS-003 华信科技、CUS-004 博通信息。
             completion += 0.02
 
         # == 2. CRM lookup (0.10) — rule-based ==
-        crm_get_calls = [d for d in dispatches if d.tool_name == "crm_get_customer"]
-        crm_list_calls = [d for d in dispatches if d.tool_name == "crm_list_customers"]
+        crm_get_calls = [d for d in dispatches if d.tool_name == "crm_get_customer" and d.response_status < 400]
+        crm_list_calls = [d for d in dispatches if d.tool_name == "crm_list_customers" and d.response_status < 400]
         looked_up_customers = {d.request_body.get("customer_id") for d in crm_get_calls}
         relevant_lookups = looked_up_customers & self.ALL_CUSTOMER_IDS
 
@@ -258,8 +258,8 @@ VIP客户为：CUS-003 华信科技、CUS-004 博通信息。
         completion += 0.10 * crm_score
 
         # == 3. Ticket correlation (0.10) — rule-based ==
-        ticket_get_calls = [d for d in dispatches if d.tool_name == "helpdesk_get_ticket"]
-        ticket_list_calls = [d for d in dispatches if d.tool_name == "helpdesk_list_tickets"]
+        ticket_get_calls = [d for d in dispatches if d.tool_name == "helpdesk_get_ticket" and d.response_status < 400]
+        ticket_list_calls = [d for d in dispatches if d.tool_name == "helpdesk_list_tickets" and d.response_status < 400]
         fetched_tickets = {d.request_body.get("ticket_id") for d in ticket_get_calls}
         relevant_tickets = fetched_tickets & self.TICKET_IDS
 

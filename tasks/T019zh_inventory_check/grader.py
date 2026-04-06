@@ -169,7 +169,7 @@ SKU-010（Type-C扩展坞）是已缺货的预订商品：
         actions_summary = self.summarize_actions(audit_data)
 
         # 1) Listing products (0.10) — rule-based
-        list_calls = [d for d in dispatches if d.tool_name == "inventory_list_products"]
+        list_calls = [d for d in dispatches if d.tool_name == "inventory_list_products" and d.response_status < 400]
         if list_calls:
             completion += 0.10
 
@@ -181,8 +181,9 @@ SKU-010（Type-C扩展坞）是已缺货的预订商品：
         completion += 0.35 * (found / len(self.LOW_STOCK_PRODUCTS))
 
         # 3) Order placement (0.10) — rule-based
-        if order_calls:
-            ordered_skus = {d.request_body.get("product_id") for d in order_calls}
+        successful_order_calls = [d for d in dispatches if d.tool_name == "inventory_create_order" and d.response_status < 400]
+        if successful_order_calls:
+            ordered_skus = {d.request_body.get("product_id") for d in successful_order_calls}
             critical_ordered = ordered_skus & {"SKU-004", "SKU-001", "SKU-010"}
             completion += 0.10 * min(len(critical_ordered) / 2, 1.0)
         else:

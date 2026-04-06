@@ -142,17 +142,17 @@ class MarketResearchReportGrader(AbstractGrader):
 
         # --- Tool usage gate: check all 5 services ---
         rss_calls = [d for d in dispatches
-                     if d.tool_name in ("rss_list_articles", "rss_get_article")]
+                     if d.tool_name in ("rss_list_articles", "rss_get_article") and d.response_status < 400]
         kb_calls = [d for d in dispatches
-                    if d.tool_name in ("kb_search", "kb_get_article")]
+                    if d.tool_name in ("kb_search", "kb_get_article") and d.response_status < 400]
         crm_calls = [d for d in dispatches
-                     if d.tool_name in ("crm_list_customers", "crm_get_customer")]
+                     if d.tool_name in ("crm_list_customers", "crm_get_customer") and d.response_status < 400]
         gmail_calls = [d for d in dispatches
-                       if d.tool_name in ("gmail_list_messages", "gmail_get_message")]
+                       if d.tool_name in ("gmail_list_messages", "gmail_get_message") and d.response_status < 400]
         contacts_calls = [d for d in dispatches
-                          if d.tool_name in ("contacts_search", "contacts_get")]
+                          if d.tool_name in ("contacts_search", "contacts_get") and d.response_status < 400]
         draft_calls = [d for d in dispatches
-                       if d.tool_name == "gmail_save_draft"]
+                       if d.tool_name == "gmail_save_draft" and d.response_status < 400]
 
         tool_penalty = 1.0
         # RSS: need substantial reading (list + multiple get)
@@ -207,8 +207,15 @@ class MarketResearchReportGrader(AbstractGrader):
                 print(f"[grader] strategic_analysis judge failed: {e}")
 
             try:
+                draft_artifacts = self.format_audit_artifacts(
+                    audit_data,
+                    services=["gmail"],
+                    endpoints=["/gmail/drafts/save"],
+                    include_request=True,
+                    include_response=True, response_status_only=True,
+                )
                 result = judge.evaluate(
-                    task.prompt.text, context, "", self._DELIVERABLE_RUBRIC)
+                    task.prompt.text, context, draft_artifacts, self._DELIVERABLE_RUBRIC)
                 completion += 0.30 * result.score
                 print(f"[grader] deliverable_quality: {result.score:.2f}")
             except Exception as e:

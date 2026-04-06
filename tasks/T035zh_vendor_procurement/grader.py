@@ -289,7 +289,7 @@ agent应该：
 
     def _score_tool_coverage(self, dispatches: list[ToolDispatch]) -> float:
         """Score breadth of data gathering across 5 services."""
-        called = {d.tool_name for d in dispatches}
+        called = {d.tool_name for d in dispatches if d.response_status < 400}
 
         service_checks = [
             # inventory
@@ -310,20 +310,20 @@ agent应该：
             "inventory_get_product", "rss_get_article",
             "crm_get_customer", "kb_get_article", "finance_get_transaction",
         }
-        detail_calls = [d for d in dispatches if d.tool_name in detail_tools]
+        detail_calls = [d for d in dispatches if d.tool_name in detail_tools and d.response_status < 400]
         depth = min(len(detail_calls) / 10, 1.0)
 
         return round(breadth * 0.6 + depth * 0.4, 4)
 
     def _score_market_research(self, dispatches: list[ToolDispatch]) -> float:
         """Score RSS article reading depth (rule-based)."""
-        called = {d.tool_name for d in dispatches}
+        called = {d.tool_name for d in dispatches if d.response_status < 400}
         score = 0.0
 
         if "rss_list_articles" in called:
             score += 0.3
 
-        rss_get_calls = [d for d in dispatches if d.tool_name == "rss_get_article"]
+        rss_get_calls = [d for d in dispatches if d.tool_name == "rss_get_article" and d.response_status < 400]
         articles_read = {d.request_body.get("article_id") for d in rss_get_calls}
         n = len(articles_read)
         if n >= 4:

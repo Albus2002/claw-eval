@@ -292,7 +292,7 @@ class OpsReviewDashboardGrader(AbstractGrader):
     @staticmethod
     def _score_tool_coverage(dispatches: list[ToolDispatch]) -> float:
         """Score breadth and depth of tool usage across 6 services."""
-        called = {d.tool_name for d in dispatches}
+        called = {d.tool_name for d in dispatches if d.response_status < 400}
 
         # -- Breadth: did agent query each service? --
         service_checks = [
@@ -318,7 +318,7 @@ class OpsReviewDashboardGrader(AbstractGrader):
             "scheduler_get_job", "scheduler_job_history",
             "kb_get_article",
         }
-        detail_calls = [d for d in dispatches if d.tool_name in detail_tools]
+        detail_calls = [d for d in dispatches if d.tool_name in detail_tools and d.response_status < 400]
         # 8+ detail calls → full depth; fewer → proportional
         depth = min(len(detail_calls) / 8, 1.0)
 

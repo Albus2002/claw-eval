@@ -43,8 +43,8 @@ class RestaurantMenuContactGrader(AbstractGrader):
         anchor_score = self._anchor_coverage_score(all_text)
 
         # OCR + web effort (0.5 each)
-        ocr_calls = len([d for d in dispatches if d.tool_name == "ocr_extract_text"])
-        web_calls = len([d for d in dispatches if d.tool_name in ("web_search", "web_fetch")])
+        ocr_calls = len([d for d in dispatches if d.tool_name == "ocr_extract_text" and d.response_status < 400])
+        web_calls = len([d for d in dispatches if d.tool_name in ("web_search", "web_fetch") and d.response_status < 400])
         tool_effort = 0.5 * min(ocr_calls, 1) + 0.5 * min(web_calls, 1)
 
         judged = judge.evaluate(

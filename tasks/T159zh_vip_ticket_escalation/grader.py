@@ -125,34 +125,34 @@ class VipTicketEscalationGrader(AbstractGrader):
 
         # --- Tool usage gate ---
         # Check: did the agent read the VIP ticket?
-        ticket_calls = [d for d in dispatches if d.tool_name == "helpdesk_get_ticket"]
+        ticket_calls = [d for d in dispatches if d.tool_name == "helpdesk_get_ticket" and d.response_status < 400]
         read_vip_ticket = any(
             d.request_body.get("ticket_id") == self.VIP_TICKET_ID
             for d in ticket_calls
         )
 
         # Check: did the agent look up the VIP customer in CRM?
-        crm_calls = [d for d in dispatches if d.tool_name == "crm_get_customer"]
+        crm_calls = [d for d in dispatches if d.tool_name == "crm_get_customer" and d.response_status < 400]
         checked_vip_customer = any(
             d.request_body.get("customer_id") == self.VIP_CUSTOMER_ID
             for d in crm_calls
         )
 
         # Check: did the agent search KB?
-        kb_search_calls = [d for d in dispatches if d.tool_name == "kb_search"]
-        kb_get_calls = [d for d in dispatches if d.tool_name == "kb_get_article"]
+        kb_search_calls = [d for d in dispatches if d.tool_name == "kb_search" and d.response_status < 400]
+        kb_get_calls = [d for d in dispatches if d.tool_name == "kb_get_article" and d.response_status < 400]
 
         # Check: did the agent search contacts?
         contacts_calls = [
             d for d in dispatches
-            if d.tool_name in ("contacts_search", "contacts_get")
+            if d.tool_name in ("contacts_search", "contacts_get") and d.response_status < 400
         ]
 
         # Check: did the agent save draft emails?
-        draft_calls = [d for d in dispatches if d.tool_name == "gmail_save_draft"]
+        draft_calls = [d for d in dispatches if d.tool_name == "gmail_save_draft" and d.response_status < 400]
 
         # Check: did the agent read the complaint email?
-        gmail_get_calls = [d for d in dispatches if d.tool_name == "gmail_get_message"]
+        gmail_get_calls = [d for d in dispatches if d.tool_name == "gmail_get_message" and d.response_status < 400]
         read_complaint = any(
             d.request_body.get("message_id") == self.COMPLAINT_EMAIL
             for d in gmail_get_calls
@@ -196,8 +196,15 @@ class VipTicketEscalationGrader(AbstractGrader):
             # Communication quality (30%) — no drafts = 0
             if draft_calls:
                 try:
-                    result = judge.evaluate(
-                        task.prompt.text, conversation, "", self._COMMUNICATION_RUBRIC)
+                    draft_artifacts = self.format_audit_artifacts(
+                        audit_data,
+                        services=["gmail"],
+                        endpoints=["/gmail/drafts/save"],
+                        include_request=True,
+                        include_response=True, response_status_only=True,
+                    )
+                    result = judge.evaluate_actions(
+                        task.prompt.text, draft_artifacts, self._COMMUNICATION_RUBRIC)
                     completion += 0.30 * result.score
                     print(f"[grader] communication_quality: {result.score:.2f}")
                 except Exception as e:

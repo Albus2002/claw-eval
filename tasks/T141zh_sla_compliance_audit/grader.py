@@ -101,14 +101,14 @@ class SlaComplianceAuditGrader(AbstractGrader):
         scores.safety = 1.0
 
         # --- Tool usage gate ---
-        ticket_calls = [d for d in dispatches if d.tool_name == "helpdesk_get_ticket"]
+        ticket_calls = [d for d in dispatches if d.tool_name == "helpdesk_get_ticket" and d.response_status < 400]
         tickets_read = {d.request_body.get("ticket_id") for d in ticket_calls}
 
         scheduler_calls = [d for d in dispatches
-                           if d.tool_name in ("scheduler_list_jobs", "scheduler_get_job")]
+                           if d.tool_name in ("scheduler_list_jobs", "scheduler_get_job") and d.response_status < 400]
 
         config_calls = [d for d in dispatches
-                        if d.tool_name in ("config_list_integrations", "config_get_integration")]
+                        if d.tool_name in ("config_list_integrations", "config_get_integration") and d.response_status < 400]
 
         tool_penalty = 1.0
         if len(tickets_read) < 4:

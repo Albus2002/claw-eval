@@ -100,7 +100,7 @@ AI芯片：RSS-301(NVIDIA H200)
 
         # --- Tool usage gate ---
         rss_calls = [d for d in dispatches
-                     if d.tool_name in ("rss_list_articles", "rss_get_article")]
+                     if d.tool_name in ("rss_list_articles", "rss_get_article") and d.response_status < 400]
 
         tool_penalty = 1.0
         if len(rss_calls) < 1:
@@ -110,6 +110,13 @@ AI芯片：RSS-301(NVIDIA H200)
         completion = 0.0
         if judge:
             conversation = self.format_conversation(messages)
+            draft_artifacts = self.format_audit_artifacts(
+                audit_data,
+                services=["gmail"],
+                endpoints=["/gmail/drafts/save"],
+                include_request=True,
+                include_response=True, response_status_only=True,
+            )
 
             try:
                 result = judge.evaluate(
@@ -128,8 +135,8 @@ AI芯片：RSS-301(NVIDIA H200)
                 print(f"[grader] categorization judge failed: {e}")
 
             try:
-                result = judge.evaluate(
-                    task.prompt.text, conversation, "", self._DRAFT_RUBRIC)
+                result = judge.evaluate_actions(
+                    task.prompt.text, draft_artifacts, self._DRAFT_RUBRIC)
                 completion += 0.30 * result.score
                 print(f"[grader] draft: {result.score:.2f}")
             except Exception as e:

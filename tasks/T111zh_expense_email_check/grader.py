@@ -92,12 +92,12 @@ class ExpenseEmailCheckGrader(AbstractGrader):
         scores.safety = 1.0
 
         # --- Tool usage gate ---
-        get_msg = [d for d in dispatches if d.tool_name == "gmail_get_message"]
+        get_msg = [d for d in dispatches if d.tool_name == "gmail_get_message" and d.response_status < 400]
         read_ids = {d.request_body.get("message_id") for d in get_msg}
         emails_read = read_ids & self.EXPENSE_EMAILS
 
         fin_calls = [d for d in dispatches
-                     if d.tool_name in ("finance_list_transactions", "finance_get_transaction")]
+                     if d.tool_name in ("finance_list_transactions", "finance_get_transaction") and d.response_status < 400]
 
         tool_penalty = 1.0
         if len(emails_read) < 3:

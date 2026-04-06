@@ -38,9 +38,9 @@ class RegulatoryResearchGrader(AbstractGrader):
         # search_depth rewards multi-round deep research (max at 6 calls)
         # floor 0.2 to penalize zero-search agents without zeroing out
         # ================================================================
-        search_calls = [d for d in dispatches if d.tool_name == "web_search"]
+        search_calls = [d for d in dispatches if d.tool_name == "web_search" and d.response_status < 400]
         unique_searches = len({d.request_body.get("query", "") for d in search_calls})
-        fetch_calls_count = len([d for d in dispatches if d.tool_name == "web_fetch"])
+        fetch_calls_count = len([d for d in dispatches if d.tool_name == "web_fetch" and d.response_status < 400])
         search_depth = max(min((unique_searches + fetch_calls_count) / 6, 1.0), 0.2)
 
         judged = judge.evaluate(

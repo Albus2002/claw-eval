@@ -128,13 +128,17 @@ agent需要起草一封合适的回复。
         conversation = self.format_conversation(messages)
         actions_summary = self.summarize_actions(audit_data)
 
-        draft_calls = [d for d in dispatches if d.tool_name == "gmail_save_draft"]
+        draft_calls = [d for d in dispatches if d.tool_name == "gmail_save_draft" and d.response_status < 400]
         draft_texts = " ".join(str(d.request_body.get("body", "")) for d in draft_calls)
         combined_text = final_text + " " + draft_texts
+        draft_artifacts = self.format_audit_artifacts(
+            audit_data, endpoints=["/gmail/drafts/save"],
+            include_response=True, response_status_only=True,
+        )
 
         # 1) Listing + reading emails (0.15) — rule-based
-        list_calls = [d for d in dispatches if d.tool_name == "gmail_list_messages"]
-        get_calls = [d for d in dispatches if d.tool_name == "gmail_get_message"]
+        list_calls = [d for d in dispatches if d.tool_name == "gmail_list_messages" and d.response_status < 400]
+        get_calls = [d for d in dispatches if d.tool_name == "gmail_get_message" and d.response_status < 400]
         msgs_read = {d.request_body.get("message_id") for d in get_calls}
         if list_calls:
             completion += 0.05
@@ -155,17 +159,17 @@ agent需要起草一封合适的回复。
         elif draft_calls:
             completion += 0.08
 
-        # 3) Client draft quality (0.20) — LLM Judge
-        completion += 0.20 * self._call_judge(
-            judge, task.prompt.text, conversation, actions_summary,
+        # 3) Client draft quality (0.20) — LLM Judge (from audit log)
+        completion += 0.20 * judge.evaluate_actions(
+            task.prompt.text, draft_artifacts,
             self._CLIENT_DRAFT_QUALITY_RUBRIC,
-        )
+        ).score
 
-        # 4) Thread awareness (0.12) — LLM Judge
-        completion += 0.12 * self._call_judge(
-            judge, task.prompt.text, conversation, actions_summary,
+        # 4) Thread awareness (0.12) — LLM Judge (from audit log)
+        completion += 0.12 * judge.evaluate_actions(
+            task.prompt.text, draft_artifacts,
             self._THREAD_AWARENESS_RUBRIC,
-        )
+        ).score
 
         # 5) Saving draft to boss (0.13) — rule-based
         boss_draft = any(
@@ -177,11 +181,11 @@ agent需要起草一封合适的回复。
         elif "竞品" in combined_text or "分析报告" in combined_text:
             completion += 0.03
 
-        # 6) Boss draft quality (0.15) — LLM Judge
-        completion += 0.15 * self._call_judge(
-            judge, task.prompt.text, conversation, actions_summary,
+        # 6) Boss draft quality (0.15) — LLM Judge (from audit log)
+        completion += 0.15 * judge.evaluate_actions(
+            task.prompt.text, draft_artifacts,
             self._BOSS_DRAFT_QUALITY_RUBRIC,
-        )
+        ).score
 
         scores.completion = min(completion, 1.0)
 

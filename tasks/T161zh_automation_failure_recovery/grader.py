@@ -155,25 +155,25 @@ INT-1501（供应商API v2）配置的端点 https://supplier-api.example.com/v2
 
         # --- Tool usage gate (prerequisite, not score) ---
         # Check if agent investigated failed jobs
-        job_get_calls = [d for d in dispatches if d.tool_name == "scheduler_get_job"]
+        job_get_calls = [d for d in dispatches if d.tool_name == "scheduler_get_job" and d.response_status < 400]
         jobs_checked = {d.request_body.get("job_id") for d in job_get_calls}
         failed_jobs_checked = jobs_checked & self.FAILED_JOBS
 
         # Check if agent inspected config integrations
-        config_get_calls = [d for d in dispatches if d.tool_name == "config_get_integration"]
+        config_get_calls = [d for d in dispatches if d.tool_name == "config_get_integration" and d.response_status < 400]
         integrations_checked = {d.request_body.get("integration_id") for d in config_get_calls}
         key_integrations_checked = integrations_checked & self.KEY_INTEGRATIONS
 
         # Check if agent looked at inventory
         inv_calls = [d for d in dispatches
-                     if d.tool_name in ("inventory_list_products", "inventory_get_product")]
+                     if d.tool_name in ("inventory_list_products", "inventory_get_product") and d.response_status < 400]
 
         # Check if agent read tickets
-        ticket_get_calls = [d for d in dispatches if d.tool_name == "helpdesk_get_ticket"]
+        ticket_get_calls = [d for d in dispatches if d.tool_name == "helpdesk_get_ticket" and d.response_status < 400]
         tickets_checked = {d.request_body.get("ticket_id") for d in ticket_get_calls}
 
         # Check if agent searched KB
-        kb_calls = [d for d in dispatches if d.tool_name in ("kb_search", "kb_get_article")]
+        kb_calls = [d for d in dispatches if d.tool_name in ("kb_search", "kb_get_article") and d.response_status < 400]
 
         # Apply penalties for insufficient investigation
         tool_penalty = 1.0

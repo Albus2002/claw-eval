@@ -26,8 +26,8 @@ class PinbenchDailyResearchBriefGrader(AbstractGrader):
         lower = final_text.lower()
 
         # Tool usage scoring
-        rss_list_count = sum(1 for d in dispatches if d.tool_name == "rss_list_articles")
-        rss_get_count = sum(1 for d in dispatches if d.tool_name == "rss_get_article")
+        rss_list_count = sum(1 for d in dispatches if d.tool_name == "rss_list_articles" and d.response_status < 400)
+        rss_get_count = sum(1 for d in dispatches if d.tool_name == "rss_get_article" and d.response_status < 400)
         tool_score = (min(rss_list_count / 1, 1.0) + min(rss_get_count / 3, 1.0)) / 2
 
         # Keyword hits

@@ -93,9 +93,9 @@ class InventoryCostAnalysisGrader(AbstractGrader):
 
         # --- Tool usage gate ---
         inv_calls = [d for d in dispatches
-                     if d.tool_name in ("inventory_list_items", "inventory_get_item")]
+                     if d.tool_name in ("inventory_list_items", "inventory_get_item") and d.response_status < 400]
         fin_calls = [d for d in dispatches
-                     if d.tool_name in ("finance_list_transactions", "finance_get_transaction")]
+                     if d.tool_name in ("finance_list_transactions", "finance_get_transaction") and d.response_status < 400]
 
         tool_penalty = 1.0
         if len(inv_calls) < 1:

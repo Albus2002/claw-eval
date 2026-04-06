@@ -45,9 +45,9 @@ class VideoMmeCoauthorPapersGrader(AbstractGrader):
         all_text = self._get_all_assistant_text(messages)
         anchor_score = self._anchor_coverage_score(all_text)
 
-        search_calls = [d for d in dispatches if d.tool_name == "web_search"]
+        search_calls = [d for d in dispatches if d.tool_name == "web_search" and d.response_status < 400]
         unique_searches = len({d.request_body.get("query", "") for d in search_calls})
-        fetch_calls_count = len([d for d in dispatches if d.tool_name == "web_fetch"])
+        fetch_calls_count = len([d for d in dispatches if d.tool_name == "web_fetch" and d.response_status < 400])
         search_effort = min((unique_searches + fetch_calls_count) / 8, 1.0)
 
         judged = judge.evaluate(

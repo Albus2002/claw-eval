@@ -158,26 +158,26 @@ class OnsiteSupportDispatchGrader(AbstractGrader):
 
         # --- Tool usage gate ---
         # Must read the critical ticket
-        ticket_calls = [d for d in dispatches if d.tool_name == "helpdesk_get_ticket"]
+        ticket_calls = [d for d in dispatches if d.tool_name == "helpdesk_get_ticket" and d.response_status < 400]
         tickets_read = {d.request_body.get("ticket_id") for d in ticket_calls}
         read_critical = self.CRITICAL_TICKET in tickets_read
 
         # Must check the VIP customer CRM record
-        crm_calls = [d for d in dispatches if d.tool_name == "crm_get_customer"]
+        crm_calls = [d for d in dispatches if d.tool_name == "crm_get_customer" and d.response_status < 400]
         customers_checked = {d.request_body.get("customer_id") for d in crm_calls}
         checked_vip = self.VIP_CUSTOMER in customers_checked
 
         # Must check calendar/schedule for technicians
         cal_calls = [d for d in dispatches
                      if d.tool_name in ("calendar_list_events", "calendar_get_event",
-                                        "calendar_get_user_events")]
+                                        "calendar_get_user_events") and d.response_status < 400]
 
         # Must look up contacts/technicians
         contact_calls = [d for d in dispatches
-                         if d.tool_name in ("contacts_search", "contacts_get")]
+                         if d.tool_name in ("contacts_search", "contacts_get") and d.response_status < 400]
 
         # Must save at least one draft
-        draft_calls = [d for d in dispatches if d.tool_name == "gmail_save_draft"]
+        draft_calls = [d for d in dispatches if d.tool_name == "gmail_save_draft" and d.response_status < 400]
 
         tool_penalty = 1.0
         if not read_critical:
@@ -215,8 +215,15 @@ class OnsiteSupportDispatchGrader(AbstractGrader):
             # Notification quality — draft emails (30%)
             if draft_calls:
                 try:
-                    result = judge.evaluate(
-                        task.prompt.text, conversation, "", self._NOTIFICATION_RUBRIC)
+                    draft_artifacts = self.format_audit_artifacts(
+                        audit_data,
+                        services=["gmail"],
+                        endpoints=["/gmail/drafts/save"],
+                        include_request=True,
+                        include_response=True, response_status_only=True,
+                    )
+                    result = judge.evaluate_actions(
+                        task.prompt.text, draft_artifacts, self._NOTIFICATION_RUBRIC)
                     completion += 0.30 * result.score
                     print(f"[grader] notification_quality: {result.score:.2f}")
                 except Exception as e:

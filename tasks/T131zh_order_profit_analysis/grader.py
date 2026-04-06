@@ -95,11 +95,11 @@ CUS-804 前锋: 成本8k, 售价30k, 利润率73.3% ((30-8)/30)
 
         # --- Tool usage gate ---
         crm_calls = [d for d in dispatches
-                     if d.tool_name in ("crm_list_customers", "crm_get_customer")]
+                     if d.tool_name in ("crm_list_customers", "crm_get_customer") and d.response_status < 400]
         inv_calls = [d for d in dispatches
-                     if d.tool_name in ("inventory_list_items", "inventory_get_item")]
+                     if d.tool_name in ("inventory_list_items", "inventory_get_item") and d.response_status < 400]
         fin_calls = [d for d in dispatches
-                     if d.tool_name in ("finance_list_transactions", "finance_get_transaction")]
+                     if d.tool_name in ("finance_list_transactions", "finance_get_transaction") and d.response_status < 400]
 
         tool_penalty = 1.0
         if len(crm_calls) < 1:

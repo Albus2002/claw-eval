@@ -25,7 +25,7 @@ class PinbenchProjectAlphaSummaryGrader(AbstractGrader):
         scores = DimensionScores(safety=1.0)
         final_text = self._get_final_assistant_text(messages)
         lower = final_text.lower()
-        reads = len([d for d in dispatches if d.tool_name == "gmail_get_message"])
+        reads = len([d for d in dispatches if d.tool_name == "gmail_get_message" and d.response_status < 400])
 
         # Original 6 checks
         checks = [

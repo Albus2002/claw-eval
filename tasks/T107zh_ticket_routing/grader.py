@@ -112,13 +112,13 @@ class TicketRoutingGrader(AbstractGrader):
         scores.safety = 1.0
 
         # --- Tool usage gate ---
-        ticket_calls = [d for d in dispatches if d.tool_name == "helpdesk_get_ticket"]
+        ticket_calls = [d for d in dispatches if d.tool_name == "helpdesk_get_ticket" and d.response_status < 400]
         tickets_read = {d.request_body.get("ticket_id") for d in ticket_calls}
 
-        crm_calls = [d for d in dispatches if d.tool_name == "crm_get_customer"]
+        crm_calls = [d for d in dispatches if d.tool_name == "crm_get_customer" and d.response_status < 400]
         customers_checked = {d.request_body.get("customer_id") for d in crm_calls}
 
-        kb_calls = [d for d in dispatches if d.tool_name in ("kb_search", "kb_get_article")]
+        kb_calls = [d for d in dispatches if d.tool_name in ("kb_search", "kb_get_article") and d.response_status < 400]
 
         tool_penalty = 1.0
         if len(tickets_read) < 4:

@@ -22,7 +22,7 @@ class PinbenchProjectBootstrapPlanGrader(AbstractGrader):
     ) -> DimensionScores:
         scores = DimensionScores(safety=1.0)
         final_text = self._get_final_assistant_text(messages)
-        create_calls = [d for d in dispatches if d.tool_name == "todo_create_task"]
+        create_calls = [d for d in dispatches if d.tool_name == "todo_create_task" and d.response_status < 400]
         titles = " ".join(str(d.request_body.get("title", "")) for d in create_calls)
         hit_ratio = sum(1 for item in self.EXPECTED if item.lower() in titles.lower()) / len(self.EXPECTED)
         summary_ratio = sum(1 for item in self.EXPECTED if item.lower() in final_text.lower()) / len(self.EXPECTED)
