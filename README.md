@@ -43,7 +43,7 @@ Browse the full leaderboard and individual task cases at **[claw-eval.github.io]
 
 ## Tasks
 
-300 tasks across 3 splits and 9 categories, each with human-verified rubrics.
+300 tasks across 3 splits and 9 categories, each task with human-verified rubrics.
 
 | Split | Count | Description |
 |-------|-------|-------------|
